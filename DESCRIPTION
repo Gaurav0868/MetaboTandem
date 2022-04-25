@@ -1,0 +1,61 @@
+Package: MetaboTandem
+Title: What the Package Does (One Line, Title Case)
+Version: 0.0.0.9000
+Authors@R: 
+    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: What the package does (one paragraph).
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2
+Imports: 
+    Biobase,
+    BiocGenerics,
+    BiocParallel,
+    CAMERA,
+    cluster,
+    data.table,
+    DiagrammeR (>= 1.0.5.9000),
+    digest,
+    ggplot2,
+    ggpubr,
+    graphics,
+    grDevices,
+    Hmisc,
+    igraph,
+    jsonlite,
+    lsa,
+    MassTools (>= 0.2.9),
+    methods,
+    MSnbase,
+    mzR,
+    plotly,
+    qgraph,
+    Rdisop,
+    rhandsontable,
+    scales,
+    shiny,
+    shinyBS,
+    shinydashboard,
+    shinyFiles,
+    shinyjs,
+    stats,
+    TeachingDemos,
+    utils,
+    VennDiagram,
+    xcms (>= 3.14)
+Suggests: 
+    covr,
+    DiagrammeRsvg,
+    knitr,
+    png,
+    rcdk,
+    rlang,
+    rmarkdown,
+    rsvg,
+    shinytest,
+    shinyAce,
+    testthat (>= 3.0.0),
+    xml2
+Config/testthat/edition: 3
