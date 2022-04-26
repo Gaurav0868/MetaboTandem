@@ -4,6 +4,7 @@ Version: 0.0.0.9000
 Authors@R: 
     person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
+biocViews: MassSpectrometry, DataAnalysis
 Description: What the package does (one paragraph).
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -39,7 +40,8 @@ Imports:
     stats,
     stringr,
     TeachingDemos,
-    utils
+    utils,
+    xcms
 Suggests: 
     covr,
     DiagrammeRsvg,
