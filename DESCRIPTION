@@ -2,7 +2,7 @@ Package: MetaboTandem
 Title: What the Package Does (One Line, Title Case)
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
+    person("Christian", "Ayala-Ortiz", , "cayalaortiz@email.arizona.edu", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
 biocViews: MassSpectrometry, DataAnalysis
 Description: What the package does (one paragraph).
@@ -15,22 +15,19 @@ Imports:
     BiocGenerics,
     BiocParallel,
     CAMERA,
-    DiagrammeR (>= 1.0.5.9000),
-    digest,
+    methods,
     ggplot2,
     ggpubr,
     graphics,
     grDevices,
     Hmisc,
     igraph,
-    methods,
     MSnbase,
     mzR,
     plotly,
     qgraph,
     Rdisop,
     readr,
-    rhandsontable,
     scales,
     shiny,
     shinyBS,
@@ -39,12 +36,13 @@ Imports:
     shinyjs,
     stats,
     stringr,
-    TeachingDemos,
     utils,
-    xcms
+    xcms,
+    magrittr,
+    Rcpp,
+    tibble
 Suggests: 
     covr,
-    DiagrammeRsvg,
     knitr,
     png,
     rcdk,

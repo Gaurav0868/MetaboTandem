@@ -2,21 +2,21 @@
 % Please edit documentation in R/preprocessing_functions.R
 \name{apply_peak_picking}
 \alias{apply_peak_picking}
-\title{Apply peak picking}
+\title{Apply Peak Picking}
 \usage{
 apply_peak_picking(data, p.width, snt, noise, prefilter = c(3, 100))
 }
 \arguments{
 \item{data}{An \linkS4class{MSnExp} object in \emph{centroid} mode.}
 
-\item{p.width}{Minium and maximum allowed peak width}
+\item{p.width}{Minium and maximum allowed peak width.}
 
-\item{snt}{Minimum signal-to-noise threshold allowed}
+\item{snt}{Minimum signal-to-noise threshold allowed.}
 
-\item{noise}{Noise threshold}
+\item{noise}{Noise threshold.}
 
 \item{prefilter}{Prefilter step cutoff (\code{c(k, I)}). Mass will be retained if
-they contain at least \code{k} peaks with intensity >= \code{I}}
+they contain at least \code{k} peaks with intensity >= \code{I}.}
 }
 \description{
 Function to apply peak picking parameters on a data subset

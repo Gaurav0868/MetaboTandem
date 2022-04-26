@@ -9,7 +9,7 @@ load_spectra_data(datadir, metadata, format = "mzML")
 \arguments{
 \item{datadir}{Path to the directory with the data.}
 
-\item{metadata}{Sample information file.}
+\item{metadata}{Sample information data.frame.}
 
 \item{format}{Format of the data.}
 }

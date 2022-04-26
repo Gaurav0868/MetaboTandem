@@ -4,10 +4,14 @@
 \alias{extract_number_peaks}
 \title{Extract number of peaks}
 \usage{
-extract_number_peaks(data, save.table = FALSE, save.figure = FALSE)
+extract_number_peaks(data, save_table = NULL, save_figure = NULL)
 }
 \arguments{
 \item{data}{An \linkS4class{MSnExp} object with peaks picked}
+
+\item{save_table}{Path to save the extracted table or \code{NULL}}
+
+\item{save_figure}{Path to save the figure or \code{NULL}}
 }
 \description{
 Function to apply peak picking parameters on a data subset

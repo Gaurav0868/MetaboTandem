@@ -1,11 +1,4 @@
-#' Color vectors
-#'
-#' Create color vectors
-#'
-#'
-#' @param metadata Sample information file
-#' @param color_by Column to color output
-#'
+# Create color vectors
 create_col_vector <- function(metadata, color_by = 'AUTO'){
 
   if(color_by == 'AUTO'){

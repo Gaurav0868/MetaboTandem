@@ -1,3 +1,5 @@
 ^MetaboTandem\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
+test_data
+test_output
