@@ -14,7 +14,7 @@ load_spectra_data <- function(datadir,
                               format = 'mzML'){
 
   # Get list of mass spectra files
-  ms_files <- list.files(data_dir, full.names = TRUE,
+  ms_files <- list.files(datadir, full.names = TRUE,
                          pattern = paste0('*.', format))
 
   # Read data as an `OnDiskMSnExp` object from xcms
@@ -79,6 +79,8 @@ test_peak_picking <- function(data,
                               prefilter = c(3, 100)){
   # Test peak picking parameters
 
+  print('Starting setting up parameters')
+
   cwp <- xcms::CentWaveParam(
     peakwidth = p.width,
     snthresh = snt,
@@ -94,6 +96,8 @@ test_peak_picking <- function(data,
     plot(col = "indianred2",
          ylab="Intensity", xlab="Retention Time (sec)",
          font.lab=1, cex.lab=1, cex.axis=1, font.main=1, cex.main=1)
+
+  print('Graph done')
 
 
 }

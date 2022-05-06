@@ -40,7 +40,10 @@ Imports:
     xcms,
     magrittr,
     Rcpp,
-    tibble
+    tibble,
+    pkgload,
+    vroom,
+    tools
 Suggests: 
     covr,
     knitr,
