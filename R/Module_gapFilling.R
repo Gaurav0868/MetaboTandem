@@ -7,16 +7,13 @@
 gapFillingUI <- function(id){
   ns <- NS(id)
   tagList(
-    h2('Gap filling'),
-    fluidRow(
-      column(6,
-             actionButton(ns('gap_fill'), 'Apply Alignment and Correspondence',
-                          class = 'btn-lg btn-success')
-      ),
-      column(6,
-             tableOutput(ns('no_gap_table'))
-      )
-    ),
+    h2('Before Gap filling'),
+    plotOutput(ns('gap_plot')),
+    actionButton(ns('apply_gap'), 'Apply Gap Filling',
+                 class = 'btn-lg btn-success'),
+    h2('After Gap Filling'),
+    plotOutput(ns('no_gap_plot')),
+    tableOutput(ns('num_filled')),
     verbatimTextOutput(ns('is_gap_filled'))
   )
 }
@@ -24,10 +21,11 @@ gapFillingUI <- function(id){
 gapFillingServer <- function(id, data_grouped){
   moduleServer(id, function(input, output, session){
 
-    output$no_gap_table <- renderTable(
-      featureValues(data_grouped()),
-      striped = TRUE,
-      bordered = TRUE
+    features <- featureValues(data_grouped())
+
+
+    output$no_gap_plot <- renderPlot(
+
     )
 
   })
