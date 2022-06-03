@@ -125,8 +125,7 @@ spectraServer <- function(id, metadata){
 
 #' Load data UI
 #'
-#' @param id, character used to specify namespace,
-#'            see \code{shiny::\link[shiny]{NS}}
+#' @param id character used to specify namespace, see [`shiny::NS`][shiny::NS()]
 #'
 #' @return a \code{shiny::\link[shiny]{tagList}} containing UI elements
 
@@ -144,8 +143,7 @@ load_dataUI <- function(id){
 
 #' Load data server-side processing
 #'
-#' @param id character used to specify namespace,
-#'            see \code{shiny::\link[shiny]{NS}}\
+#' @param id character used to specify namespace, see [`shiny::NS`][shiny::NS()]
 #'
 #' @return list with following components
 #'   \describe{

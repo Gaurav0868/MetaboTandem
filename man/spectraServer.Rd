@@ -7,7 +7,7 @@
 spectraServer(id, metadata)
 }
 \arguments{
-\item{id}{character used to specify namespace, see \link[shiny:NS]{shiny::NS}}
+\item{id}{character used to specify namespace, see \code{\link[shiny:NS]{shiny::NS}}}
 
 \item{metadata}{dataframe with sample information}
 }

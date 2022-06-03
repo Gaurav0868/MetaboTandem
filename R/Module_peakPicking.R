@@ -1,6 +1,6 @@
 #' Peak picking spectra UI
 #'`
-#' @param id, character used to specify namespace, see [`shiny::NS`][shiny::NS()]
+#' @param id character used to specify namespace, see [`shiny::NS`][shiny::NS()]
 #'
 #' @return a \code{shiny::\link[shiny]{tagList}} containing UI elements
 
@@ -47,7 +47,7 @@ peakPickingUI <- function(id){
 
 #' Peak picking server-side processing
 #'
-#' @param id character used to specify namespace, see [shiny::NS][shiny::NS()]
+#' @param id character used to specify namespace, see [`shiny::NS`][shiny::NS()]
 #' @param data dataframe with sample information
 #'
 #' @return

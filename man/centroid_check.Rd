@@ -9,7 +9,7 @@ centroid_check(data, transform = TRUE)
 \arguments{
 \item{data}{An \linkS4class{MSnExp} object.}
 
-\item{transform}{Transform the data into centroid mode.}
+\item{transform}{Transform the data into centroid mode}
 }
 \description{
 This function checks if data is centroided

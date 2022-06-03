@@ -45,7 +45,8 @@ Imports:
     vroom,
     tools,
     waiter,
-    tidyr
+    tidyr,
+    ProtGenerics
 Suggests: 
     covr,
     knitr,
@@ -60,3 +61,6 @@ Suggests:
     xml2
 Config/testthat/edition: 3
 URL: https://coayala.github.io/MetaboTandem/
+Depends: 
+    R (>= 2.10)
+LazyData: true

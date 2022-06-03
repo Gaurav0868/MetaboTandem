@@ -7,8 +7,7 @@
 metadataUI(id)
 }
 \arguments{
-\item{id, }{character used to specify namespace,
-see \code{shiny::\link[shiny]{NS}}}
+\item{id}{character used to specify namespace, see \code{\link[shiny:NS]{shiny::NS}}}
 }
 \value{
 a \code{shiny::\link[shiny]{tagList}} containing UI elements

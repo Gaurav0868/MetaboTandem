@@ -33,7 +33,8 @@ load_spectra_data <- function(datadir,
 #'
 #'
 #' @param data An [MSnExp-class] object.
-#' @param transform Transform the data into centroid mode.
+#' @param transform Transform the data into centroid mode
+#' @importFrom MSnbase pickPeaks
 #'
 #' @export
 centroid_check <- function(data,

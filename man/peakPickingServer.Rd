@@ -7,7 +7,7 @@
 peakPickingServer(id, data)
 }
 \arguments{
-\item{id}{character used to specify namespace, see \link[shiny:NS]{shiny::NS}}
+\item{id}{character used to specify namespace, see \code{\link[shiny:NS]{shiny::NS}}}
 
 \item{data}{dataframe with sample information}
 }

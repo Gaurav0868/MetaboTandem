@@ -2,16 +2,18 @@
 % Please edit documentation in R/Module_peakPicking.R
 \name{peakPickingUI}
 \alias{peakPickingUI}
-\title{Peak picking spectra UI}
+\title{Peak picking spectra UI
+`}
 \usage{
 peakPickingUI(id)
 }
 \arguments{
-\item{id, }{character used to specify namespace, see \link[shiny:NS]{shiny::NS}}
+\item{id}{character used to specify namespace, see \code{\link[shiny:NS]{shiny::NS}}}
 }
 \value{
 a \code{shiny::\link[shiny]{tagList}} containing UI elements
 }
 \description{
 Peak picking spectra UI
+`
 }

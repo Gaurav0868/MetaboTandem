@@ -7,8 +7,7 @@
 load_dataServer(id)
 }
 \arguments{
-\item{id}{character used to specify namespace,
-see \code{shiny::\link[shiny]{NS}}\}
+\item{id}{character used to specify namespace, see \code{\link[shiny:NS]{shiny::NS}}}
 }
 \value{
 list with following components

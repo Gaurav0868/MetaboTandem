@@ -7,7 +7,7 @@
 gapFillingUI(id)
 }
 \arguments{
-\item{id, }{character used to specify namespace, see \link[shiny:NS]{shiny::NS}}
+\item{id}{character used to specify namespace, see \code{\link[shiny:NS]{shiny::NS}}}
 }
 \value{
 a \code{shiny::\link[shiny]{tagList}} containing UI elements
