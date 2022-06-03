@@ -4,7 +4,7 @@
 \alias{apply_peak_picking}
 \title{Apply Peak Picking}
 \usage{
-apply_peak_picking(data, p.width, snt, noise, prefilter = c(3, 100))
+apply_peak_picking(data, p.width, snt, noise, prefilter = c(1, 100))
 }
 \arguments{
 \item{data}{An \linkS4class{MSnExp} object in \emph{centroid} mode.}

@@ -11,7 +11,7 @@ test_peak_picking(
   p.width,
   snt,
   noise,
-  prefilter = c(3, 100)
+  prefilter = c(1, 100)
 )
 }
 \arguments{

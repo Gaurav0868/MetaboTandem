@@ -7,15 +7,12 @@
 metadataServer(id)
 }
 \arguments{
-\item{id, }{character used to specify namespace, see \code{shiny::\link[shiny]{NS}}}
-
-\item{input, }{output, session standard \code{shiny} boilerplate}
+\item{id}{character used to specify namespace,
+see \code{shiny::\link[shiny]{NS}}\}
 }
 \value{
-list with following components
 \describe{
-\item{xvar}{reactive character string indicating x variable selection}
-\item{yvar}{reactive character string indicating y variable selection}
+\item{metadata}{dataframe with sample information}
 }
 }
 \description{

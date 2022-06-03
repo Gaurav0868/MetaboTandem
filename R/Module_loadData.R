@@ -1,6 +1,6 @@
 #' Metadata uploading UI
 #'
-#' @param id, character used to specify namespace, see \code{shiny::\link[shiny]{NS}}
+#' @param id character used to specify namespace, see [`shiny::NS`][shiny::NS()]
 #'
 #' @return a \code{shiny::\link[shiny]{tagList}} containing UI elements
 
@@ -15,13 +15,12 @@ metadataUI <- function(id){
 
 #' Metadata uploading  server-side processing
 #'
-#' @param id, character used to specify namespace, see \code{shiny::\link[shiny]{NS}}
-#' @param input, output, session standard \code{shiny} boilerplate
+#' @param id character used to specify namespace,
+#'            see \code{shiny::\link[shiny]{NS}}\
 #'
-#' @return list with following components
+#' @return
 #' \describe{
-#'   \item{xvar}{reactive character string indicating x variable selection}
-#'   \item{yvar}{reactive character string indicating y variable selection}
+#'   \item{metadata}{dataframe with sample information}
 #' }
 
 metadataServer <- function(id){
@@ -43,15 +42,23 @@ metadataServer <- function(id){
     })
 
     output$metadata_table <- renderDataTable(
-      metadata()
+      metadata(),
+      options = list(scrollX = TRUE)
     )
     return(metadata)
   })
 }
 
+#' Spectra uploading UI
+#'
+#' @param id character used to specify namespace, see [`shiny::NS`][shiny::NS()]
+#'
+#' @return a \code{shiny::\link[shiny]{tagList}} containing UI elements
+
 spectraUI <- function(id){
   ns <- NS(id)
   tagList(
+    waiter::use_waiter(),
     h2('Select data directory'),
     shinyDirButton(ns('datadir'), 'Choose data folder',
                       'Please select folder with data',
@@ -59,12 +66,22 @@ spectraUI <- function(id){
     br(),
     verbatimTextOutput(ns('sel_directory')),
     br(),
-    actionButton(ns('load'), 'Load Data'),
+    selectInput(ns('format'), 'Data format', c('mzML', 'mzXML')),
     br(),
     verbatimTextOutput(ns('is_loaded')),
-    br()
+    actionButton(ns('load'), 'Load Data', class = 'btn-primary')
   )
 }
+
+#' Spectra uploading server-side processing
+#'
+#' @param id character used to specify namespace, see [`shiny::NS`][shiny::NS()]
+#' @param metadata dataframe with sample information
+#'
+#' @return
+#' \describe{
+#'   \item {data_cent} {A centroided [MSnExp-class] object}
+#' }
 
 spectraServer <- function(id, metadata){
   moduleServer(id, function(input, output, session){
@@ -79,46 +96,71 @@ spectraServer <- function(id, metadata){
       paste('Directory selected: ', data_dir())
     )
 
-    data <- eventReactive(input$load, {
-      temp_met <- metadata()
+    data_cent <- reactiveVal()
+
+    observe({
+      req(input$load)
+      notid <- showNotification('Reading data...',
+                                duration = NULL, closeButton = FALSE)
+      on.exit(removeNotification(notid), add = TRUE)
+      temp_metadata <- metadata()
       temp_data <- load_spectra_data(data_dir(),
-                                     temp_met,
+                                     temp_metadata,
                                      input$format)
-      centroid_check(temp_data,
-                     transform = TRUE)
+      data_cent(centroid_check(temp_data,
+                               transform = TRUE))
     })
-    output$is_loaded <- renderText(
-      if(is(data(), 'OnDiskMSnExp')){
+
+    output$is_loaded <- renderText({
+      if(is(data_cent(), 'OnDiskMSnExp')){
         'Data loaded correctly'
       } else {
         'Please load your data'
       }
-    )
+    })
 
-    return(data)
+    return(data_cent)
   })
 }
+
+#' Load data UI
+#'
+#' @param id, character used to specify namespace,
+#'            see \code{shiny::\link[shiny]{NS}}
+#'
+#' @return a \code{shiny::\link[shiny]{tagList}} containing UI elements
 
 load_dataUI <- function(id){
   ns <- NS(id)
   fluidRow(
     column(6,
-      metadataUI(ns('met1'))
+      metadataUI(ns('metadata'))
     ),
     column(6,
-      spectraUI(ns('spec1'))
+      spectraUI(ns('spectra'))
     )
   )
 }
 
+#' Load data server-side processing
+#'
+#' @param id character used to specify namespace,
+#'            see \code{shiny::\link[shiny]{NS}}\
+#'
+#' @return list with following components
+#'   \describe{
+#'     \item {data_cent}{A centroided [MSnExp-class] object}
+#'     \item {data_cent}{Dataframe with sample information}
+#'   }
+
 load_dataServer <- function(id){
   moduleServer(id, function(input, output, session){
-    metadata <- metadataServer('met1')
-    data <- spectraServer('spec1', metadata)
+    metadata <- metadataServer('metadata')
+    data_cent <- spectraServer('spectra', metadata)
 
     return(
-      list(data = reactive({data}),
-           metadata = reactive({metadata}))
+      list(data_cent = data_cent,
+           metadata = metadata)
     )
   })
 }

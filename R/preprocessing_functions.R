@@ -76,7 +76,7 @@ test_peak_picking <- function(data,
                               p.width,
                               snt,
                               noise,
-                              prefilter = c(3, 100)){
+                              prefilter = c(1, 100)){
   # Test peak picking parameters
 
   print('Starting setting up parameters')
@@ -89,11 +89,11 @@ test_peak_picking <- function(data,
   )
 
   data %>%
-    xcms::filterRt(rt = rt.range) %>%
-    xcms::filterMz(mz = mz.range) %>%
+    ProtGenerics::filterRt(rt = rt.range) %>%
+    ProtGenerics::filterMz(mz = mz.range) %>%
     xcms::chromatogram(., aggregationFun="max") %>%
     xcms::findChromPeaks(., param = cwp) %>%
-    plot(col = "indianred2",
+    xcms::plot(., col = "indianred2",
          ylab="Intensity", xlab="Retention Time (sec)",
          font.lab=1, cex.lab=1, cex.axis=1, font.main=1, cex.main=1)
 
@@ -119,15 +119,17 @@ apply_peak_picking <- function(data,
                                p.width,
                                snt,
                                noise,
-                               prefilter = c(3, 100)){
+                               prefilter = c(1, 100)){
   # Test peak picking parameters
 
   cwp <- xcms::CentWaveParam(
     peakwidth = p.width,
     snthresh = snt,
     noise = noise,
-    prefilter = c(1, 100)
+    prefilter = prefilter
   )
+
+  print('Starting peak picking')
 
   data <- xcms::findChromPeaks(data, param = cwp)
 
@@ -156,40 +158,48 @@ apply_alignment <- function(data,
                             metadata,
                             min_frac,
                             min_samples,
-                            bin,
+                            bin = 0.25,
                             bw = 30,
-                            group_by){
+                            group_by,
+                            plot = FALSE){
   # Defining peak density parameters
 
   sample_groups <- dplyr::pull(metadata, group_by)
+
   pdp <- xcms::PeakDensityParam(sampleGroups = sample_groups,
                           bw = bw,
                           minFraction = min_frac,
-                          minSamples = min_sampless,
+                          minSamples = min_samples,
                           binSize = bin)
 
   # Defining peak grouping parameters
   pgp <- xcms::PeakGroupsParam(minFraction = min_frac)
+
+  print('Starting alignment')
 
   ## a - Group peaks
   data_grouped <- xcms::groupChromPeaks(data, param = pdp)
   ## b - alignment
   data_aligned <- xcms::adjustRtime(data_grouped, param = pgp)
 
-  color_vector <- create_color_vector(metadata, color_by = group_by)
+  print('Alignment done')
 
-  plotAdjustedRtime(data_aligned,
-                    col = color_vector,
-                    xlab="Retention Time (sec)",
-                    font.lab=2,
-                    cex.lab=2,
-                    cex.axis=2,
-                    font.main=2,
-                    cex.main=2,
-                    lwd=2)
-  legend("topright",
-         legend = unique(names(color_vector)),
-         col = unique(color_vector), lty=1)
+  if(plot == TRUE){
+    color_vector <- create_col_vector(metadata, color_by = group_by)
+    plotAdjustedRtime(data_aligned,
+                      col = color_vector,
+                      xlab="Retention Time (sec)",
+                      font.lab=2,
+                      cex.lab=2,
+                      cex.axis=2,
+                      font.main=2,
+                      cex.main=2,
+                      lwd=2)
+    legend("topright",
+           legend = unique(names(color_vector)),
+           col = unique(color_vector), lty=1)
+    print('Plot done')
+  }
 
   return(data_aligned)
 }
@@ -216,12 +226,13 @@ apply_correspondence <- function(data,
                                  metadata,
                                  min_frac,
                                  min_samples,
-                                 bin,
+                                 bin = 0.25,
                                  bw = 30,
                                  group_by){
   # Defining peak density parameters
 
-  sample_groups <- pull(metadata, group_by)
+  print('Starting grouping data')
+  sample_groups <- dplyr::pull(metadata, group_by)
   pdp <- PeakDensityParam(sampleGroups = sample_groups,
                           bw = bw,
                           minFraction = min_frac,

@@ -4,7 +4,16 @@
 \alias{apply_alignment}
 \title{Apply Peak alignment}
 \usage{
-apply_alignment(data, metadata, min_frac, min_samples, bin, bw = 30, group_by)
+apply_alignment(
+  data,
+  metadata,
+  min_frac,
+  min_samples,
+  bin = 0.25,
+  bw = 30,
+  group_by,
+  plot = FALSE
+)
 }
 \arguments{
 \item{data}{An \linkS4class{MSnExp} object in \emph{centroid} mode.}

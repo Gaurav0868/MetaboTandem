@@ -34,8 +34,21 @@ MetaboTandemApp <- function(){
     # Sidebar content
     dashboardSidebar(
       sidebarMenu(
-        menuItem('Load Data', tabName = 'load_data', icon = icon('upload')),
-        menuItem('Spectra alignment', tabName = 'align', icon = icon('align-center') )
+        menuItem('Load Data',
+                 tabName = 'load_data',
+                 icon = icon('upload')),
+        menuItem('Peak picking',
+                 tabName = 'p_pick',
+                 icon = icon('check')),
+        menuItem('Alignment & Correspondence',
+                 tabName = 'align',
+                 icon = icon('align-center')),
+        menuItem('Gap Filling',
+                 tabName = 'gap',
+                 icon = icon('fill')),
+        menuItem('Results Download',
+                 tabName = 'res',
+                 icon = icon('file-download'))
       )
     ),
 
@@ -44,18 +57,28 @@ MetaboTandemApp <- function(){
       tabItems(
         # Load data tab
         tabItem(tabName = 'load_data',
-                h2('Load your data'),
-                load_dataUI('dat1')),
+                h1('Load your data'),
+                load_dataUI('load_data')),
+        tabItem(tabName = 'p_pick',
+                h1('Peak Picking'),
+                peakPickingUI('p_pick')),
         tabItem(tabName = 'align',
-                h2('Spectra alignment'),
-                alignTestUI('test1'))
+                h1('Spectra alignment'),
+                alignSpectraUI('align')),
+        tabItem(tabName = 'gap',
+                h1('Gap Filling'),
+                gapFillingUI('gap')),
+        tabItem(tabName = 'res',
+                h1('Select data to download'))
         )
       )
     )
 
   server <- function(input, output, session) {
-    data <- load_dataServer('dat1')
-    alignTestServer('test1', data)
+    data <- load_dataServer('load_data')
+    data_cent_pp <- peakPickingServer('p_pick', data)
+    data_grouped <- alignSpectraServer('align', data$metadata, data_cent_pp)
+    gg <- gapFillingServer('gap', data_grouped)
   }
 
   shinyApp(ui, server)

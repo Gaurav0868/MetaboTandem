@@ -9,7 +9,7 @@ apply_correspondence(
   metadata,
   min_frac,
   min_samples,
-  bin,
+  bin = 0.25,
   bw = 30,
   group_by
 )

@@ -43,7 +43,9 @@ Imports:
     tibble,
     pkgload,
     vroom,
-    tools
+    tools,
+    waiter,
+    tidyr
 Suggests: 
     covr,
     knitr,
