@@ -59,3 +59,4 @@ Suggests:
     testthat (>= 3.0.0),
     xml2
 Config/testthat/edition: 3
+URL: https://coayala.github.io/MetaboTandem/
