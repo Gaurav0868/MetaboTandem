@@ -4,14 +4,14 @@
 \alias{extract_features}
 \title{Extract features}
 \usage{
-extract_features(data, save_table = NULL)
+extract_features(data)
 }
 \arguments{
 \item{data}{An \linkS4class{MSnExp} object with peaks picked.}
 
-\item{save_table}{Path to save the extracted table or \code{NULL}}
-
 \item{metadata}{Sample information data.frame.}
+
+\item{save_table}{Path to save the extracted table or \code{NULL}}
 }
 \description{
 Function to apply peak picking parameters on a data subset

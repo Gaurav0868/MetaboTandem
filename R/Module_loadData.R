@@ -22,6 +22,7 @@ metadataUI <- function(id){
 #' \describe{
 #'   \item{metadata}{dataframe with sample information}
 #' }
+#'
 
 metadataServer <- function(id){
   moduleServer(id, function(input, output, session){
@@ -131,14 +132,23 @@ spectraServer <- function(id, metadata){
 
 load_dataUI <- function(id){
   ns <- NS(id)
+  # fluidRow(
+  #   column(6,
+  #     metadataUI(ns('metadata'))
+  #   ),
+  #   column(6,
+  #     spectraUI(ns('spectra'))
+  #   )
+  # )
   fluidRow(
-    column(6,
+    box(
       metadataUI(ns('metadata'))
     ),
-    column(6,
+    box(
       spectraUI(ns('spectra'))
     )
   )
+
 }
 
 #' Load data server-side processing

@@ -71,27 +71,19 @@ extract_number_peaks <- function(data,
 #' @param save_table Path to save the extracted table or `NULL`
 #'
 #' @export
-extract_features <- function(data,
-                             save_table = NULL){
+extract_features <- function(data){
 
   ## extract feature values after filling in
-  feature_abundance_matrix <- as.data.frame(xcms::featureValues(data,
+  feature_ab_matrix <- as.data.frame(xcms::featureValues(data,
                                                           value="into",
                                                           method="maxint")) %>%
     tibble::rownames_to_column(var = 'FeatureID')
   ## replace NA with zero
-  feature_abundance_matrix[is.na(feature_abundance_matrix)] <- 0
+  feature_ab_matrix[is.na(feature_ab_matrix)] <- 0
   ## replace file name with sample name
-  colnames(feature_abundance_matrix)[-1] <- paste0(metadata$SampleID,
-                                                   '_peak_area')
+  colnames(feature_ab_matrix)[-1] <- paste0(MSnbase::pData(data)$SampleID)
 
-  if(is.null(save_table)){
-    print('Table not saved')
-  } else {
-    readr::write_csv(feature_abundance_matrix, save_table)
-  }
-
-  return(feature_abundance_matrix)
+  return(feature_ab_matrix)
 
 }
 
@@ -112,7 +104,7 @@ extract_feature_definition <- function(data,
   feature_definition <- as.data.frame(xcms::featureDefinitions(data)) %>%
     tibble::rownames_to_column(var = 'FeatureID') %>%
     dplyr::select(-peakidx) %>%
-    dplyr::left_join(feature_abundance_matrix, by = 'FeatureID')
+    dplyr::left_join(feature_abundance, by = 'FeatureID')
 
   if(is.null(save_table)){
     print('Table not saved')
@@ -134,13 +126,13 @@ extract_feature_definition <- function(data,
 #' @export
 extract_spectra_table <- function(data, save_table = NULL){
 
-  spectra_table <- Biobase::fData(spectra_centroid) %>%
+  spectra_table <- MSnbase::fData(data) %>%
     tibble::rownames_to_column(var = 'SpectraID')
 
   if(is.null(save_table)){
     print('Table not saved')
   } else {
-    write_csv(spectra_table, save_table)
+    readr::write_csv(spectra_table, save_table)
   }
 
   return(spectra_table)
@@ -155,25 +147,30 @@ extract_spectra_table <- function(data, save_table = NULL){
 #' @param save_table Path to save the extracted table or `NULL`
 #'
 #' @export
-extract_MS2 <- function(data, save_spectra){
+extract_MS2_consensus <- function(data){
 
-  # This function uses custom functions for database compatibility from the Github Repo:
+  # This function uses custom functions for database compatibility from the
+  # Github Repo:
   # https://github.com/jorainer/xcms-gnps-tools
 
-  filteredMs2Spectra <- xcms::featureSpectra(data, return.type = "MSpectra", msLevel = 2)
-  filteredMs2Spectra <- MSnbase::clean(filteredMs2Spectra, all = TRUE)
-  filteredMs2Spectra <- formatSpectraForGNPS(filteredMs2Spectra) # this is one of the custom funtions
-  filteredMs2Spectra_consensus <- MSnbase::combineSpectra(filteredMs2Spectra,
-                                                 fcol = "feature_id",
-                                                 method = MSnbase::consensusSpectrum,
-                                                 mzd = 0,
-                                                 minProp = 0.5,
-                                                 ppm = 25,
-                                                 intensityFun = median,
-                                                 mzFun = median)
+  print('Starting extraction')
 
-  mod_writeMgfDataFile(filteredMs2Spectra_consensus, save_spectra)
+  filtMs2Spectra <- xcms::featureSpectra(data_gap, return.type = "MSpectra",
+                                         msLevel = 2)
+  filtMs2Spectra <- MSnbase::clean(filtMs2Spectra,
+                                   all = TRUE)
+  filtMs2Spectra <- formatSpectraForGNPS(filtMs2Spectra)
+  Ms2_consensus <- MSnbase::combineSpectra(filtMs2Spectra,
+                                           fcol = "feature_id",
+                                           method = MSnbase::consensusSpectrum,
+                                           mzd = 0,
+                                           minProp = 0.5,
+                                           ppm = 25,
+                                           intensityFun = median,
+                                           mzFun = median)
 
-  return(filteredMs2Spectra_consensus)
+  print('Extraction finished')
+
+  return(Ms2_consensus)
 }
 

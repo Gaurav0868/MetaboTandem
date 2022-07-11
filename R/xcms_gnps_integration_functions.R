@@ -19,11 +19,11 @@
 #'
 #' @noRd
 formatSpectraForGNPS <- function(x) {
-  fids <- mcols(x)$feature_id
+  fids <- S4Vectors::mcols(x)$feature_id
   if (!length(fids))
     stop("No column named 'feature_id' present in 'mcols(x)'")
   fids <- as.integer(sub("^FT", "", fids))
-  mendoapply(x, fids, FUN = function(z, id) {
+  S4Vectors::mendoapply(x, fids, FUN = function(z, id) {
     z@acquisitionNum <- id
     z
   })

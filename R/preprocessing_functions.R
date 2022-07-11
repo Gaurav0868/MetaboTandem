@@ -70,6 +70,10 @@ centroid_check <- function(data,
 #' @param prefilter Prefilter step cutoff (`c(k, I)`). Mass will be retained if
 #'     they contain at least `k` peaks with intensity >= `I`
 #'
+#' @importFrom MSnbase filterRt
+#' @importFrom MSnbase filterMz
+#' @importFrom MSnbase pData<-
+#'
 #' @export
 test_peak_picking <- function(data,
                               mz.range,
@@ -90,9 +94,9 @@ test_peak_picking <- function(data,
   )
 
   data %>%
-    ProtGenerics::filterRt(rt = rt.range) %>%
-    ProtGenerics::filterMz(mz = mz.range) %>%
-    xcms::chromatogram(., aggregationFun="max") %>%
+    MSnbase::filterRt(rt = rt.range) %>%
+    MSnbase::filterMz(mz = mz.range) %>%
+    MSnbase::chromatogram(., aggregationFun="max") %>%
     xcms::findChromPeaks(., param = cwp) %>%
     xcms::plot(., col = "indianred2",
          ylab="Intensity", xlab="Retention Time (sec)",
@@ -187,7 +191,7 @@ apply_alignment <- function(data,
 
   if(plot == TRUE){
     color_vector <- create_col_vector(metadata, color_by = group_by)
-    plotAdjustedRtime(data_aligned,
+    xcms::plotAdjustedRtime(data_aligned,
                       col = color_vector,
                       xlab="Retention Time (sec)",
                       font.lab=2,
@@ -234,14 +238,14 @@ apply_correspondence <- function(data,
 
   print('Starting grouping data')
   sample_groups <- dplyr::pull(metadata, group_by)
-  pdp <- PeakDensityParam(sampleGroups = sample_groups,
+  pdp <- xcms::PeakDensityParam(sampleGroups = sample_groups,
                           bw = bw,
                           minFraction = min_frac,
                           minSamples = min_samples,
                           binSize = bin)
 
   ## a - Group peaks
-  data_grouped <- groupChromPeaks(data, param = pdp)
+  data_grouped <- xcms::groupChromPeaks(data, param = pdp)
 
   return(data_grouped)
 
@@ -253,6 +257,7 @@ apply_correspondence <- function(data,
 #'
 #'
 #' @param data An [MSnExp-class] object in *centroid* mode.
+#' @import ggplot2
 #'
 #' @export
 apply_gap_filling <- function(data){

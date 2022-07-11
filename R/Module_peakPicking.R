@@ -16,18 +16,18 @@ peakPickingUI <- function(id){
       'button.'),
     fluidRow(
       column(6,
-             numericInput(ns('noise'), 'Noise threshold', value = 0),
-             numericInput(ns('snt'), 'Signal-to-noise threshold', value = 0),
+             numericInput(ns('noise'), 'Noise threshold', value = 1e6),
+             numericInput(ns('snt'), 'Signal-to-noise threshold', value = 3),
              sliderInput(ns('p.width'), 'Peak Width',
                          value = c(20, 50),
                          min = 0,
                          max = 100),
              sliderInput(ns('rt_range'), 'Retention time range for testing [s]',
-                         value = c(0, 60),
+                         value = c(0, 240),
                          min = 0,
                          max = 1200),
              sliderInput(ns('mz_range'), 'Range of m/z for testing',
-                         value = c(100, 200),
+                         value = c(100, 300),
                          min = 0,
                          max = 1200)),
       column(6,
@@ -69,8 +69,6 @@ peakPickingServer <- function(id, data){
       bindEvent(input$test)
 
     test_plot <- reactive({
-      waiter::Waiter$new(id = 'test_plot',
-                         html = waiter::spin_folding_cube())$show()
       test_peak_picking(data$data_cent(),
                         p.width = c(input$p.width[1], input$p.width[2]),
                         mz.range = c(input$mz_range[1], input$mz_range[2]),
@@ -106,7 +104,7 @@ peakPickingServer <- function(id, data){
 
     output$has_peaks <- renderText({
       if(is(data_cent_pp(), 'XCMSnExp')){
-        if(hasChromPeaks(data_cent_pp())){
+        if(xcms::hasChromPeaks(data_cent_pp())){
           'Peaks have been identified'
         } else {
           'Please apply peak picking'

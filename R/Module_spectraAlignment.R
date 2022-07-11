@@ -61,13 +61,13 @@ alignSpectraServer <- function(id, metadata, data_pp){
                       min_frac = input$min_frac,
                       min_samples = input$min_samples,
                       group_by = input$group,
-                      plot = TRUE)
+                      plot = FALSE)
     }) %>%
       bindEvent(input$align)
 
     output$align_plot <- renderPlot({
       color_vector <- create_col_vector(metadata(), color_by = input$group)
-      plotAdjustedRtime(data_aligned(),
+      xcms::plotAdjustedRtime(data_aligned(),
                         col = color_vector,
                         xlab="Retention Time (sec)",
                         font.lab=2,
@@ -96,7 +96,7 @@ alignSpectraServer <- function(id, metadata, data_pp){
 
     output$is_aligned <- renderText({
       if(is(data_aligned(), 'XCMSnExp')){
-        if(hasAdjustedRtime(data_aligned())){
+        if(xcms::hasAdjustedRtime(data_aligned())){
           'Data has been aligned'
         } else {
           'Please align data'
@@ -109,7 +109,7 @@ alignSpectraServer <- function(id, metadata, data_pp){
 
     output$is_grouped <- renderText({
       if(is(data_grouped(), 'XCMSnExp')){
-        if(hasFeatures(data_grouped())){
+        if(xcms::hasFeatures(data_grouped())){
           'Data has been grouped'
         } else {
           'Please align data'
