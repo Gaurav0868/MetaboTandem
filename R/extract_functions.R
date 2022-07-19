@@ -155,7 +155,7 @@ extract_MS2_consensus <- function(data){
 
   print('Starting extraction')
 
-  filtMs2Spectra <- xcms::featureSpectra(data_gap, return.type = "MSpectra",
+  filtMs2Spectra <- xcms::featureSpectra(data, return.type = "MSpectra",
                                          msLevel = 2)
   filtMs2Spectra <- MSnbase::clean(filtMs2Spectra,
                                    all = TRUE)
