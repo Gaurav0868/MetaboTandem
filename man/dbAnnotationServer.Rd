@@ -9,12 +9,7 @@ dbAnnotationServer(id, ms1_data, ms2_data)
 \arguments{
 \item{id}{character used to specify namespace, see \code{\link[shiny:NS]{shiny::NS}}}
 
-\item{data}{dataframe with sample information}
-}
-\value{
-\describe{
-\item{data_cent_pp}{A \linkS4class{MSnExp} object with identified peaks}
-}
+\item{ms1_data}{A \link{data.frame} with columns: 'name', 'mz' and 'rt'}
 }
 \description{
 Database annotation server

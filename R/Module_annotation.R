@@ -74,12 +74,8 @@ dbAnnotationUI <- function(id){
 #' Database annotation server
 #'
 #' @param id character used to specify namespace, see [`shiny::NS`][shiny::NS()]
-#' @param data dataframe with sample information
+#' @param ms1_data A [data.frame] with columns: 'name', 'mz' and 'rt'
 #'
-#' @return
-#' \describe{
-#'   \item{data_cent_pp}{A [MSnExp-class] object with identified peaks}
-#' }
 
 dbAnnotationServer <- function(id, ms1_data, ms2_data){
   moduleServer(id, function(input, output, session){
