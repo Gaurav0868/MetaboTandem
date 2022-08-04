@@ -11,9 +11,9 @@ load_dataServer(id)
 }
 \value{
 list with following components
-\describe{
-\item {data_cent}{A centroided \linkS4class{MSnExp} object}
-\item {data_cent}{Dataframe with sample information}
+\itemize{
+\item {\code{data_cent} A centroided \linkS4class{MSnExp} object}
+\item {\code{metadata} A dataframe with sample information}
 }
 }
 \description{

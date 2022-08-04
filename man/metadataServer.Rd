@@ -11,9 +11,7 @@ metadataServer(id)
 see \code{shiny::\link[shiny]{NS}}\}
 }
 \value{
-\describe{
-\item{metadata}{dataframe with sample information}
-}
+A \link{data.frame} with sample information
 }
 \description{
 Metadata uploading  server-side processing

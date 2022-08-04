@@ -18,10 +18,7 @@ metadataUI <- function(id){
 #' @param id character used to specify namespace,
 #'            see \code{shiny::\link[shiny]{NS}}\
 #'
-#' @return
-#' \describe{
-#'   \item{metadata}{dataframe with sample information}
-#' }
+#' @return A [data.frame] with sample information
 #'
 
 metadataServer <- function(id){
@@ -79,10 +76,7 @@ spectraUI <- function(id){
 #' @param id character used to specify namespace, see [`shiny::NS`][shiny::NS()]
 #' @param metadata dataframe with sample information
 #'
-#' @return
-#' \describe{
-#'   \item {data_cent} {A centroided [MSnExp-class] object}
-#' }
+#' @return A centroided [MSnExp-class] object
 
 spectraServer <- function(id, metadata){
   moduleServer(id, function(input, output, session){
@@ -156,9 +150,9 @@ load_dataUI <- function(id){
 #' @param id character used to specify namespace, see [`shiny::NS`][shiny::NS()]
 #'
 #' @return list with following components
-#'   \describe{
-#'     \item {data_cent}{A centroided [MSnExp-class] object}
-#'     \item {data_cent}{Dataframe with sample information}
+#'   \itemize{
+#'     \item {`data_cent` A centroided [MSnExp-class] object}
+#'     \item {`metadata` A dataframe with sample information}
 #'   }
 
 load_dataServer <- function(id){

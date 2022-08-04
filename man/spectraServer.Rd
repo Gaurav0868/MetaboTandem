@@ -12,9 +12,7 @@ spectraServer(id, metadata)
 \item{metadata}{dataframe with sample information}
 }
 \value{
-\describe{
-\item {data_cent} {A centroided \linkS4class{MSnExp} object}
-}
+A centroided \linkS4class{MSnExp} object
 }
 \description{
 Spectra uploading server-side processing
