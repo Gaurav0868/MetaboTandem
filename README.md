@@ -15,12 +15,19 @@ You can install the development version of MetaboTandem from [GitHub](https://gi
 devtools::install_github("Coayala/MetaboTandem")
 ```
 
-## Example
+Conversely you can run MetaboTandem using a docker container with:
 
-This is a basic example which shows you how to solve a common problem:
+``` bash
+docker pull coayala/metabotandem
+```
+
+## How to start the app
+
+For both the container or locally just
 
 ``` r
 library(MetaboTandem)
-## basic example code
+
+MetaboTandemApp()
 ```
 
