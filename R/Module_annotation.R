@@ -190,7 +190,7 @@ dbAnnotationServer <- function(id, data_proc){
           status = 'primary',
           width = 12,
           tabsetPanel(
-            purrr:map(selected_dbs(), function(x){
+            purrr::map(selected_dbs(), function(x){
               tabid <- stringr::str_replace(x, 'use_', 'output_')
               tabPanel(x,
                        dataTableOutput(ns(tabid)))

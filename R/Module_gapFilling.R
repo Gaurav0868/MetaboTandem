@@ -45,6 +45,7 @@ gapFillingServer <- function(id, data_grouped){
                      fill = peak),
                  color = 'black') +
         labs(y = 'Number of features') +
+        scale_fill_manual(values = c('Initial_peaks' = 'blue3')) +
         theme_bw() +
         scale_y_continuous(expand = c(0,0,0.05,0),
                            breaks = scales::pretty_breaks()) +
@@ -87,6 +88,8 @@ gapFillingServer <- function(id, data_grouped){
                      fill = peaks),
                  color = 'black') +
         labs(y = 'Number of features') +
+        scale_fill_manual(values = c('Initial_peaks' = 'blue3',
+                                     'Gap_filled' = 'firebrick')) +
         theme_bw() +
         scale_y_continuous(expand = c(0,0,0,1),
                            breaks = scales::pretty_breaks()) +
