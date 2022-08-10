@@ -190,11 +190,21 @@ dbAnnotationServer <- function(id, data_proc){
           status = 'primary',
           width = 12,
           tabsetPanel(
-            purrr::map(selected_dbs(), function(x){
-              tabid <- stringr::str_replace(x, 'use_', 'output_')
-              tabPanel(x,
-                       dataTableOutput(ns(tabid)))
-            })
+            # purrr::map(selected_dbs(), function(x){
+            #   tabid <- stringr::str_replace(x, 'use_', 'output_')
+            #   tabPanel(x,
+            #            dataTableOutput(ns(tabid)))
+            # })
+            tabPanel('Custom',
+                     dataTableOutput(ns('custom_output'))),
+            tabPanel('GNPS',
+                     dataTableOutput(ns('gnps_output'))),
+            tabPanel('MoNA',
+                     dataTableOutput(ns('mona_output'))),
+            tabPanel('MassBank',
+                     dataTableOutput(ns('massbank_output'))),
+            tabPanel('HMDB',
+                     dataTableOutput(ns('hmdb_output')))
           ))
     })
 
