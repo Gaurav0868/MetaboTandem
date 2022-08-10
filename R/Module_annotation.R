@@ -168,7 +168,8 @@ dbAnnotationServer <- function(id, data_proc){
       })
       names(p) <- selected_dbs()
       return(p)
-    })
+    }) %>%
+      bindEvent(input$extract)
 
     ms2.data <- reactive({
       extract_MS2_consensus(data())
