@@ -74,7 +74,8 @@ stastSetupServer <- function(id, data_proc){
     # Applying normalization
     norm_df <- reactive({
       notid <- showNotification('Normalizing data...')
-      features_ready <- features_df() %>%
+      features_df <- extract_features(data_proc())
+      features_ready <- features_df %>%
         tibble::column_to_rownames(var = 'FeatureID')
       norm_methods_all(features_ready,
                        input$norm_method,

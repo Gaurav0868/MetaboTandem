@@ -69,6 +69,8 @@ dbAnnotationUI <- function(id){
                                      right = TRUE),
         br(),
         br(),
+        actionButton(ns('extract'), 'Extract MS2'),
+        br(),
         actionButton(ns('annotate'), 'Start Annotation')
     ),
 
