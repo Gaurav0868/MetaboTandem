@@ -33,7 +33,12 @@ dbAnnotationUI <- function(id){
                     choices = c('positive', 'negative')),
         selectInput(ns('column'),
                     label = 'Column Type',
-                    choices = c('hilic', 'rp'))),
+                    choices = c('hilic', 'rp')),
+        numericInput(ns('candidates'),
+                     label = 'Number of candidate annotations',
+                     min = 1,
+                     step = 1,
+                     value = 1)),
     box(title = 'Select databases for annotation',
         solidHeader = TRUE,
         status = 'primary',
@@ -68,6 +73,7 @@ dbAnnotationUI <- function(id){
     ),
 
     uiOutput(ns('annot_box'))
+
   )
 }
 
@@ -77,7 +83,7 @@ dbAnnotationUI <- function(id){
 #' @param ms1_data A [data.frame] with columns: 'name', 'mz' and 'rt'
 #'
 
-dbAnnotationServer <- function(id, ms1_data, ms2_data){
+dbAnnotationServer <- function(id, data_proc){
   moduleServer(id, function(input, output, session){
     ns <- NS(id)
 
@@ -137,94 +143,46 @@ dbAnnotationServer <- function(id, ms1_data, ms2_data){
 
     # Annotate data using selected databases
 
+    available_dbs <- c('custom_db', 'gnps_db', 'mona_db', 'massbank_db', 'hmdb_db')
 
-    annotation_custom <- reactive({
-      #if(input$use_custom){
-        metid::identify_metabolites(
-          ms1.data = feature_file()[1],
-          ms2.data = mgf_file()[1],
-          ms2.match.tol = 0.5,
-          ce = "all",
-          path = './test_data/outs/',
+    selected_dbs <- reactive({
+      available_dbs[c(input$use_custom, input$use_gnps,
+                      input$use_mona, input$use_massbank,
+                      input$use_hmdb)]
+    })
+
+    parameter.list <- reactive({
+      p <- purrr::map(selected_dbs(), function(x){
+        metid::identify_metabolites_params(
           ms1.match.ppm = 15,
-          rt.match.tol = 30,
-          column = "rp",
+          rt.match.tol = 15,
+          polarity = input$polarity,
+          ce = "all",
+          column = input$column,
+          total.score.tol = 0.5,
           candidate.num = 3,
-          database = 'snyder_database_rplc0.0.3'
-        )
-      #}
+          threads = parallelly::availableCores(),
+          database = x)
+      })
+      names(p) <- selected_dbs()
+      return(p)
+    })
+
+    ms2.data <- reactive({
+      extract_MS2_consensus(data())
     }) %>%
-      bindEvent(input$annotate)
+      bindEvent(input$extract)
 
-     if(input$use_gnps){
-       param_gnps <- metid::identify_metabolites_params(
-         ms1.match.ppm = 15,
-         rt.match.tol = 15,
-         polarity = input$polarity,
-         ce = "all",
-         column = input$column,
-         total.score.tol = 0.5,
-         candidate.num = 3,
-         threads = 3,
-         database = 'gnps_db'
-       )
-     }
-
-     if(input$use_massbank){
-       param_massbank <- metid::identify_metabolites_params(
-         ms1.match.ppm = 15,
-         rt.match.tol = 15,
-         polarity = input$polarity,
-         ce = "all",
-         column = input$column,
-         total.score.tol = 0.5,
-         candidate.num = 3,
-         threads = 3,
-         database = 'massbank_db'
-       )
-    }
-
-     if(input$use_mona){
-       param_mona <- metid::identify_metabolites_params(
-         ms1.match.ppm = 15,
-         rt.match.tol = 15,
-         polarity = input$polarity,
-         ce = "all",
-         column = input$column,
-         total.score.tol = 0.5,
-         candidate.num = 3,
-         threads = 3,
-         database = 'mona_db'
-       )
-     }
-
-      params <- c(param_gnps, param_massbank, param_mona)
-      params <- params[c(input$use_gnps, input$use_massbank, input$use_mona)]
-
-      db_used <- c('GNPS', 'MassBank', 'MoNA')
-      db_used <- db_used[c(input$use_gnps, input$use_massbank, input$use_mona)]
+    ms1.data <- reactive({
+      ms1.data <- extract_features(data_proc()) %>%
+        extract_feature_definition(data_proc(), feature_abundance = .)
+    }) %>%
+      bindEvent(input$extract)
 
     annotation <- reactive({
-      t <- metid::identify_metabolite_all(
-        # ms1.data = feature_file()[1],
-        # ms2.data = mgf_file()[1],
-        ms1.data = 'feature_definitions_annot.csv',
-        ms2.data = 'MS2_spectra_consensus.mgf',
-        parameter.list = params,
-        path = './test_data/outs/'
-      )
+      mod_identify_all(ms1.data(), ms2.data(), db_dir(), parameter.list())
     }) %>%
-      bindEvent(input$annotate)
-
-    annot_table_custom <- reactive({
-      if(is(annotation_custom(), 'metIdentifyClass')){
-        metid::get_identification_table(annotation_custom())
-      }
-    }) %>%
-      bindEvent(annotation_custom())
-
-
-    ## Display annotation results
+    bindEvent(input$annotate)
 
     output$annot_box <- renderUI({
       box(title = 'Annotation Results',
@@ -232,22 +190,43 @@ dbAnnotationServer <- function(id, ms1_data, ms2_data){
           status = 'primary',
           width = 12,
           tabsetPanel(
-            tabPanel('Custom Database',
-                     dataTableOutput(ns('custom_annot'))),
-            tabPanel('GNPS',
-                     dataTableOutput(ns('gnps_annot'))),
-            tabPanel('MassBank',
-                     dataTableOutput(ns('massbank_output'))),
-            tabPanel('MoNA',
-                     dataTableOutput(ns('mona_output')))
+            purrr:map(selected_dbs(), function(x){
+              tabid <- stringr::str_replace(x, 'use_', 'output_')
+              tabPanel(x,
+                       dataTableOutput(ns(tabid)))
+            })
           ))
-    }) %>%
-      bindEvent(input$annotate)
+    })
 
-    output$custom_annot <- renderDataTable({
-      annot_table_custom()
+    output$output_custom <- renderDataTable({
+      if(input$use_custom){
+        mod_get_identification_table(annotation()[['custom_db']])
+      }
+    })
+
+    output$output_gnps <- renderDataTable({
+      if(input$use_gnps){
+        mod_get_identification_table(annotation()[['gnps_db']])
+      }
+    })
+
+    output$output_mona <- renderDataTable({
+      if(input$use_mona){
+        mod_get_identification_table(annotation()[['mona_db']])
+      }
+    })
+
+    output$output_massbank <- renderDataTable({
+      if(input$use_massbank){
+        mod_get_identification_table(annotation()[['massbank_db']])
+      }
+    })
+
+    output$output_hmdb <- renderDataTable({
+      if(input$use_hmdb){
+        mod_get_identification_table(annotation()[['hmdb']])
+      }
     })
 
   })
-
 }

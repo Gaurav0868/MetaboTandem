@@ -51,7 +51,7 @@ statsSetupUI <- function(id){
   )
 }
 
-stastSetupServer <- function(id, features_df){
+stastSetupServer <- function(id, data_proc){
   moduleServer(id, function(input, output, session){
 
    # Testing normalization
@@ -59,7 +59,9 @@ stastSetupServer <- function(id, features_df){
       notid <- showNotification('Testing normalization methods...',
                                 duration = NULL, closeButton = FALSE)
       on.exit(removeNotification(notid), add = TRUE)
-      features_ready <- features_df() %>%
+
+      features_df <- extract_features(data_proc())
+      features_ready <- features_df %>%
         tibble::column_to_rownames(var = 'FeatureID')
       normalize_by_all(features_ready)
     }) %>%

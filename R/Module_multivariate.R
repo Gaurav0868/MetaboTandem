@@ -48,7 +48,7 @@ multivariateUI <- function(id){
   )
 }
 
-multivariateServer <- function(id, norm_df, metadata){
+multivariateServer <- function(id, norm_df, metadata, user_colors){
   moduleServer(id, function(input, output, session){
 
     observe({
@@ -82,14 +82,21 @@ multivariateServer <- function(id, norm_df, metadata){
     ) %>%
       bindEvent(nmds_ord())
 
-    output$nmds <- renderPlot(
+    output$nmds <- renderPlot({
       if(input$label){
-        nmds_ord()$nmds_plot +
+        nmds_plot <- nmds_ord()$nmds_plot +
           geom_label(aes(label = SampleID))
       } else {
-        nmds_ord()$nmds_plot
+        nmds_plot <- nmds_ord()$nmds_plot
       }
-    ) %>%
+
+      if(all(user_colors() == 'Default')){
+        nmds_plot
+      } else {
+        nmds_plot +
+          scale_color_manual(values = user_colors())
+      }
+    }) %>%
       bindEvent(nmds_ord())
 
     output$scree <- renderPlot(
@@ -97,14 +104,22 @@ multivariateServer <- function(id, norm_df, metadata){
     ) %>%
       bindEvent(pca_ord())
 
-    output$PCA <- renderPlot(
-      if(isTRUE(input$label)){
-        pca_ord()$pca_plot +
+    output$PCA <- renderPlot({
+      if(input$label){
+        pca_plot <- pca_ord()$pca_plot +
           geom_label(aes(label = SampleID))
       } else {
-        pca_ord()$pca_plot
+        pca_plot <- pca_ord()$pca_plot
       }
-    ) %>%
+
+      if(all(user_colors() == 'Default')){
+        pca_plot
+      } else {
+        pca_plot +
+          scale_color_manual(values = user_colors())
+      }
+
+    }) %>%
       bindEvent(pca_ord())
 
     output$permanova <- renderTable(

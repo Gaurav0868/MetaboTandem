@@ -154,6 +154,7 @@ extract_MS2_consensus <- function(data){
   # https://github.com/jorainer/xcms-gnps-tools
 
   print('Starting extraction')
+  BiocParallel::register(BiocParallel::SerialParam())
 
   filtMs2Spectra <- xcms::featureSpectra(data, return.type = "MSpectra",
                                          msLevel = 2)

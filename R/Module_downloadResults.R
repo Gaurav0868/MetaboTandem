@@ -112,7 +112,6 @@ download_ResultspreprocServer <- function(id, data_gap_filled){
       }
     )
 
-    return(features_df)
 
   })
 }

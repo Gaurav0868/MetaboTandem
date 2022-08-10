@@ -77,8 +77,8 @@ MetaboTandemApp <- function(){
                              icon = icon('expand-alt')),
                  startExpanded = TRUE),
         menuItem('Results Download',
-                    tabName = 'res',
-                    icon = icon('download'),
+                 tabName = 'res',
+                 icon = icon('download'),
                  menuSubItem('Pre-processing Tables',
                              tabName = 'res_preproc',
                              icon = icon('file-download')))
@@ -134,8 +134,8 @@ MetaboTandemApp <- function(){
         tabItem(tabName = 'res_preproc',
                 h1('Select data to download'),
                 download_ResultspreprocUI('dl_preproc'))
-        )
-      ),
+      )
+    ),
 
     # Sidebar contet
     dashboardControlbar(
@@ -144,29 +144,33 @@ MetaboTandemApp <- function(){
         title = 'Color palette selector',
         solidHeader = TRUE,
         width = 12,
-        sidebarUI('side')
+        colorPickerUI('side')
       )
     )
-    )
+  )
 
   server <- function(input, output, session) {
 
     # Pre-processing modules
 
     data <- load_dataServer('load_data')
-    data_cent_pp <- peakPickingServer('p_pick', data)
-    data_grouped <- alignSpectraServer('align', data$metadata, data_cent_pp)
+    data_cent <- peakPickingServer('p_pick', data)
+    data_grouped <- alignSpectraServer('align', data$metadata, data_cent)
     data_gap_filled <- gapFillingServer('gap', data_grouped)
 
+    # Optional color picker function
+
+    user_colors <- colorPickerServer('side', data$metadata)
+
     # Result server for pre-processing
-    features_df <- download_ResultspreprocServer('dl_preproc', data_gap_filled)
+    download_ResultspreprocServer('dl_preproc', data_gap_filled)
 
     # Annotation
-    dbAnnotationServer('annot_dbs', features_df, features_df)
+    dbAnnotationServer('annot_dbs', data_gap_filled)
 
     # Statistical analysis module
-    norm_df <- stastSetupServer('st_setup', features_df)
-    multivariateServer('multi', norm_df, data$metadata)
+    norm_df <- stastSetupServer('st_setup', data_gap_filled)
+    multivariateServer('multi', norm_df, data$metadata, user_colors)
     diffExpressionServer('diffexp', norm_df, data$metadata)
   }
 
