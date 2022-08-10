@@ -52,7 +52,9 @@ Imports:
     limma,
     vegan,
     factoextra,
-    colourpicker
+    colourpicker,
+    pheatmap,
+    RColorBrewer
 Suggests: 
     covr,
     knitr,

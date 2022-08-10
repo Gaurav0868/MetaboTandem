@@ -147,9 +147,17 @@ diffExpressionServer <- function(id, norm_df, metadata){
       }
     })
 
-    output$hmp <- renderPlot(
-      pheatmap::
-    )
+    output$hmp <- renderPlot({
+      mapcolor <- grDevices::colorRampPalette(
+        RColorBrewer::brewer.pal(11, 'RdYlBu'))(100)[100:1]
+      pheatmap::pheatmap(hmp_matrix,
+                         cluster_rows = input$clus_rows,
+                         cluster_cols = input$clus_cols,
+                         color = mapcolor,
+                         show_rownames = FALSE,
+                         scale = 'row'
+      )
+    })
 
   })
 }
