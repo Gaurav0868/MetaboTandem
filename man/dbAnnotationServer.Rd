@@ -4,7 +4,7 @@
 \alias{dbAnnotationServer}
 \title{Database annotation server}
 \usage{
-dbAnnotationServer(id, ms1_data, ms2_data)
+dbAnnotationServer(id, data_proc)
 }
 \arguments{
 \item{id}{character used to specify namespace, see \code{\link[shiny:NS]{shiny::NS}}}
