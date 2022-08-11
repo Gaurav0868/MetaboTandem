@@ -335,7 +335,6 @@ mod_metIdentify <- function(ms1.data,
 #' @param type The type of identification table.
 #' @return A identification table (data.frame).
 #' @export
-#' \url{https://tidymass.github.io/metid/articles/metid.html}
 
 mod_get_identification_table = function(object,
                                     candidate.num = 3) {
