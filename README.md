@@ -28,6 +28,7 @@ For both the container or locally just
 
 ``` r
 library(MetaboTandem)
+library(xcms)
 
 MetaboTandemApp()
 ```
