@@ -1,6 +1,7 @@
 #' Metadata uploading UI
 #'
-#' @param id character used to specify namespace, see [`shiny::NS`][shiny::NS()]
+#' @param id character used to specify namespace,
+#' see [`shiny::NS`]([shiny::NS()])
 #'
 #' @return a \code{shiny::\link[shiny]{tagList}} containing UI elements
 
@@ -16,7 +17,7 @@ metadataUI <- function(id){
 #' Metadata uploading  server-side processing
 #'
 #' @param id character used to specify namespace,
-#'            see \code{shiny::\link[shiny]{NS}}\
+#' see \code{shiny::\link[shiny]{NS}}
 #'
 #' @return A [data.frame] with sample information
 #'

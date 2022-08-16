@@ -25,20 +25,7 @@ dbAnnotationUI <- function(id){
     shinyDirButton(ns('db_dir'), "Directory with databases",
                    'Select directory'),
     verbatimTextOutput(ns('db_dir_path')),
-    box(title = 'Spectra information',
-        solidHeader = TRUE,
-        status = 'primary',
-        selectInput(ns('polarity'),
-                    label = 'Polarity',
-                    choices = c('positive', 'negative')),
-        selectInput(ns('column'),
-                    label = 'Column Type',
-                    choices = c('hilic', 'rp')),
-        numericInput(ns('candidates'),
-                     label = 'Number of candidate annotations',
-                     min = 1,
-                     step = 1,
-                     value = 1)),
+
     box(title = 'Select databases for annotation',
         solidHeader = TRUE,
         status = 'primary',
@@ -52,7 +39,7 @@ dbAnnotationUI <- function(id){
                                      value = FALSE,
                                      status = 'success',
                                      right = TRUE),
-        shinyWidgets::materialSwitch(ns('use_masbank'),
+        shinyWidgets::materialSwitch(ns('use_massbank'),
                                      label = 'MassBank',
                                      value = FALSE,
                                      status = 'success',
@@ -67,15 +54,35 @@ dbAnnotationUI <- function(id){
                                      value = FALSE,
                                      status = 'success',
                                      right = TRUE),
-        br(),
+        actionButton(ns('set_dbs'), 'Set databases'),
+        hr(),
+        verbatimTextOutput(ns('n_dbs'))
+    ),
+
+    box(title = 'Annotation options',
+        solidHeader = TRUE,
+        status = 'primary',
+        selectInput(ns('polarity'),
+                    label = 'Polarity',
+                    choices = c('positive', 'negative')),
+        selectInput(ns('column'),
+                    label = 'Column Type',
+                    choices = c('hilic', 'rp')),
+        numericInput(ns('candidates'),
+                     label = 'Number of candidate annotations',
+                     min = 1,
+                     step = 1,
+                     value = 1),
         br(),
         actionButton(ns('extract'), 'Extract MS2'),
         br(),
-        actionButton(ns('annotate'), 'Start Annotation')
-    ),
+        verbatimTextOutput(ns('ms2_data_check')),
+        br(),
+        uiOutput(ns('annotation_button')),
+        uiOutput(ns('tables_button'))),
 
-    uiOutput(ns('annot_box'))
-
+    uiOutput(ns('annot_box')),
+    verbatimTextOutput(ns('test_annot'))
   )
 }
 
@@ -145,13 +152,47 @@ dbAnnotationServer <- function(id, data_proc){
 
     # Annotate data using selected databases
 
-    available_dbs <- c('custom_db', 'gnps_db', 'mona_db', 'massbank_db', 'hmdb_db')
+    ms1.data <- reactive({
+      ms1.data <- extract_features(data_proc()) %>%
+        extract_feature_definition(data_proc(), feature_abundance = .)
+    }) %>%
+      bindEvent(input$extract)
+
+    ms2.data <- reactive({
+      notid <- showNotification('Extracting MS2...',
+                                duration = NULL, closeButton = FALSE)
+      on.exit(removeNotification(notid), add = TRUE)
+      suppressWarnings(extract_MS2_consensus(data_proc()))
+    }) %>%
+      bindEvent(input$extract)
+
+    output$ms2_data_check <- renderPrint({
+      if(is(ms2.data(), 'MSpectra')){
+        'MS2 data extracted succesfully'
+      }
+    })
+
+    output$annotation_button <- renderUI({
+      actionButton(ns('annotate'), 'Start Annotation')
+    }) %>%
+      bindEvent(ms2.data())
+
+    available_dbs <- c('custom_db', 'gnps_db', 'massbank_db', 'mona_db', 'hmdb_db')
 
     selected_dbs <- reactive({
-      available_dbs[c(input$use_custom, input$use_gnps,
-                      input$use_mona, input$use_massbank,
+      available_dbs[c(input$use_custom,
+                      input$use_gnps,
+                      input$use_massbank,
+                      input$use_mona,
                       input$use_hmdb)]
-    })
+    }) %>%
+      bindEvent(input$set_dbs)
+
+    output$n_dbs <- renderPrint({
+      n <- length(selected_dbs())
+      paste(n, 'databases selected')
+    }) %>%
+      bindEvent(input$set_dbs)
 
     parameter.list <- reactive({
       p <- purrr::map(selected_dbs(), function(x){
@@ -169,77 +210,116 @@ dbAnnotationServer <- function(id, data_proc){
       names(p) <- selected_dbs()
       return(p)
     }) %>%
-      bindEvent(input$extract)
-
-    ms2.data <- reactive({
-      extract_MS2_consensus(data())
-    }) %>%
-      bindEvent(input$extract)
-
-    ms1.data <- reactive({
-      ms1.data <- extract_features(data_proc()) %>%
-        extract_feature_definition(data_proc(), feature_abundance = .)
-    }) %>%
-      bindEvent(input$extract)
+      bindEvent(selected_dbs())
 
     annotation <- reactive({
+      notid <- showNotification('Annotating with selected databases...',
+                                duration = NULL, closeButton = FALSE)
+      on.exit(removeNotification(notid), add = TRUE)
       mod_identify_all(ms1.data(), ms2.data(), db_dir(), parameter.list())
     }) %>%
-    bindEvent(input$annotate)
+      bindEvent(input$annotate)
+
+    output$tables_button <- renderUI({
+
+    }) %>%
+      bindEvent(annotation())
 
     output$annot_box <- renderUI({
       box(title = 'Annotation Results',
           solidHeader = TRUE,
           status = 'primary',
           width = 12,
-          tabsetPanel(
-            # purrr::map(selected_dbs(), function(x){
-            #   tabid <- stringr::str_replace(x, 'use_', 'output_')
-            #   tabPanel(x,
-            #            dataTableOutput(ns(tabid)))
-            # })
-            tabPanel('Custom',
-                     dataTableOutput(ns('custom_output'))),
-            tabPanel('GNPS',
-                     dataTableOutput(ns('gnps_output'))),
-            tabPanel('MoNA',
-                     dataTableOutput(ns('mona_output'))),
-            tabPanel('MassBank',
-                     dataTableOutput(ns('massbank_output'))),
-            tabPanel('HMDB',
-                     dataTableOutput(ns('hmdb_output')))
-          ))
+          tabsetPanel(id = ns('annot_tabs'),
+                      tabPanel('...',
+                               actionButton(ns('get_table'), 'Get annotation_tables')))
+      )
+    }) %>%
+      bindEvent(annotation())
+
+
+    observeEvent(input$get_table, {
+      tabname <- stringr::str_to_title(stringr::str_replace(selected_dbs(), '_db', 'Database'))
+      table_id <- stringr::str_replace(selected_dbs(), '_db', '_input')
+
+      purrr::map2(tabname, table_id, function(x,y){
+        insertTab(inputId = 'annot_tabs',
+                  tabPanel(x,
+                           dataTableOutput(ns(y))))
+      })
     })
 
-    output$output_custom <- renderDataTable({
-      if(input$use_custom){
-        mod_get_identification_table(annotation()[['custom_db']])
-      }
+
+    # insertTab(inputId = 'annot_tabs',
+    #           tab = tabPanel('dd', h2('ha')),
+    #           target = 'Results')
+
+
+    # ))
+    # })
+
+    # annot_tables <- reactive({
+    #   custom_annot
+    # })
+    #
+    # output$custom_output<- renderDataTable({
+    #   if(input$use_custom){
+    #     mod_get_identification_table(annotation()[['custom_db']])
+    #   } else {
+    #     tibble(Database = '', not_selected = '')
+    #   }
+    # }) %>%
+    #   bindEvent(annotation())
+    #
+    # output$custom_output<- renderDataTable({
+    #   if(input$use_custom){
+    #     mod_get_identification_table(annotation()[['custom_db']])
+    #   } else {
+    #     tibble(Database = '', not_selected = '')
+    #   }
+    # }) %>%
+    #   bindEvent(annotation())
+    #
+    # output$gnps_output <- renderDataTable({
+    #   if(input$use_gnps){
+    #     mod_get_identification_table(annotation()[['gnps_db']])
+    #   } else {
+    #     tibble(Database = '', not_selected = '')
+    #   }
+    # }) %>%
+    #   bindEvent(annotation())
+    #
+    # output$mona_output <- renderDataTable({
+    #   if(input$use_mona){
+    #     mod_get_identification_table(annotation()[['mona_db']])
+    #   } else {
+    #     tibble(Database = '', not_selected = '')
+    #   }
+    # }) %>%
+    #   bindEvent(annotation())
+    # #
+    # output$massbank_output <- renderDataTable({
+    #   if(input$use_massbank){
+    #     mod_get_identification_table(annotation()[['massbank_db']])
+    #   } else {
+    #     tibble(Database = '', not_selected = '')
+    #   }
+    # }) %>%
+    #   bindEvent(annotation())
+    #
+    # output$hmdb_output <- renderDataTable({
+    #   if(input$use_hmdb){
+    #     mod_get_identification_table(annotation()[['hmdb']])
+    #   } else {
+    #     tibble(Database = '', not_selected = '')
+    #   }
+    # }) %>%
+    #   bindEvent(annotation())
+
+    output$test_annot <- renderPrint({
+      names(annotation())
     })
 
-    output$output_gnps <- renderDataTable({
-      if(input$use_gnps){
-        mod_get_identification_table(annotation()[['gnps_db']])
-      }
-    })
-
-    output$output_mona <- renderDataTable({
-      if(input$use_mona){
-        mod_get_identification_table(annotation()[['mona_db']])
-      }
-    })
-
-    output$output_massbank <- renderDataTable({
-      if(input$use_massbank){
-        mod_get_identification_table(annotation()[['massbank_db']])
-      }
-    })
-
-    output$output_hmdb <- renderDataTable({
-      if(input$use_hmdb){
-        mod_get_identification_table(annotation()[['hmdb']])
-      }
-    })
 
   })
 }

@@ -8,7 +8,7 @@ metadataServer(id)
 }
 \arguments{
 \item{id}{character used to specify namespace,
-see \code{shiny::\link[shiny]{NS}}\}
+see \code{shiny::\link[shiny]{NS}}}
 }
 \value{
 A \link{data.frame} with sample information

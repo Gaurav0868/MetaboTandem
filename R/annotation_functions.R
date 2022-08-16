@@ -87,10 +87,11 @@ mod_identify_all <- function (ms1.data,
   dbs <- purrr::map(parameter.list, function(x){
     path <- file.path(db_dir, paste0(x[[1]]$database, '.rds'))
     if(file.exists(path)){
+      print(paste0('Loading ', x[[1]]$database))
       x <- readRDS(path)
 
     } else {
-      print(paste0(x$database, ' is not in the database_directory. Skipping'))
+      print(paste0(x[[1]]$database, ' is not in the database_directory. Skipping'))
       x <- NULL
     }
 
@@ -131,9 +132,14 @@ mod_identify_all <- function (ms1.data,
                                database_name = param[[1]]$database,
                                threads = param[[1]]$threads)
 
+
     }
 
   })
+
+  print('Annotation finished')
+
+  return(identification_results)
 
 
 }
