@@ -107,7 +107,7 @@ spectraServer <- function(id, metadata){
                                transform = TRUE))
     })
 
-    output$is_loaded <- renderText({
+    output[['is_loaded']] <- renderText({
       if(is(data_cent(), 'OnDiskMSnExp')){
         'Data loaded correctly'
       } else {

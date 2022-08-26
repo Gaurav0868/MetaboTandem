@@ -34,13 +34,14 @@ annotate_CAMERA <- function(data, group_by){
 #' Function to identify metabolites using multiple databases at once. This
 #' function was modified from the package [metid](https://github.com/tidymass/metid)
 #'
-#'@param ms1.data A [data.frame] with 3 columns: 'name', 'mz' and 'rt'
-#'@param ms2.data A character containign the MS2 data in mgf format
+#'@param ms1.data A [data.frame] containing the columns 'FeatureID', 'mzmed' and 'rtmed'
+#'@param ms2.data An [MSpectra] object containing MS2 data
 #'@param parameter.list A list containing the parameters to process each database.
-#'Parameters must be created using [metid::metIdentifyParam]
+#'Parameters must be created using [metid::metIdentifyParam()]
 #'
-#'@return A [mzIdentifyClass] object wth the annotation results
+#'@return A list of [mzIdentifyClass] objects with the annotation results
 #'
+#'@export
 
 mod_identify_all <- function (ms1.data,
                               ms2.data,
@@ -146,15 +147,7 @@ mod_identify_all <- function (ms1.data,
 
 #' Modified - Identify metabolites using
 #'
-#' Function to identify metabolites using multiple databases at once. This
-#' function was modified from the package [metid](https://github.com/tidymass/metid)
-#'
-#'@param ms1.data A [data.frame] with 3 columns: 'name', 'mz' and 'rt'
-#'@param ms2.data A character containign the MS2 data in mgf format
-#'@param parameter.list A list containing the parameters to process each database.
-#'Parameters must be created using [metid::metIdentifyParam]
-#'
-#'@return A [mzIdentifyClass] object with the annotation results
+#' Modified function to identify metabolites
 #'
 
 mod_metIdentify <- function(ms1.data,
@@ -336,10 +329,9 @@ mod_metIdentify <- function(ms1.data,
 #' Function to retrieve annotation table. This
 #' function was modified from the package [metid](https://github.com/tidymass/metid)
 #'
-#' @param ... One or multiple metIdentifyClass objects.
+#' @param object One or multiple metIdentifyClass objects.
 #' @param candidate.num The number of candidates.
-#' @param type The type of identification table.
-#' @return A identification table (data.frame).
+#' @return A identification table [data.frame].
 #' @export
 
 mod_get_identification_table = function(object,
@@ -439,9 +431,9 @@ mod_get_identification_table = function(object,
 
   ###add Candidate.number
   Candidate.number <- purrr::map2(
-    .x = object@identification.result,
-    .y = names(object@identification.result),
-    .f = function(x, y) {
+    object@identification.result,
+    names(object@identification.result),
+    function(x, y) {
       data.frame(MS2.spectra.name = y,
                  Candidate.number = nrow(x))
     }

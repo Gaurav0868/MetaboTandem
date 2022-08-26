@@ -8,8 +8,15 @@
 \description{
 Analysis and Visualization of LC-MS/MS data
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://coayala.github.io/MetaboTandem/}
+}
+
+}
 \author{
-\strong{Maintainer}: First Last \email{first.last@example.com} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})
+\strong{Maintainer}: Christian Ayala-Ortiz \email{cayalaortiz@email.arizona.edu} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})
 
 }
 \keyword{internal}

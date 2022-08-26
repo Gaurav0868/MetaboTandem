@@ -7,14 +7,12 @@
 mod_get_identification_table(object, candidate.num = 3)
 }
 \arguments{
+\item{object}{One or multiple metIdentifyClass objects.}
+
 \item{candidate.num}{The number of candidates.}
-
-\item{...}{One or multiple metIdentifyClass objects.}
-
-\item{type}{The type of identification table.}
 }
 \value{
-A identification table (data.frame).
+A identification table \link{data.frame}.
 }
 \description{
 Function to retrieve annotation table. This

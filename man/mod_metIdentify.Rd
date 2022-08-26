@@ -32,18 +32,6 @@ mod_metIdentify(
   threads = 3
 )
 }
-\arguments{
-\item{ms1.data}{A \link{data.frame} with 3 columns: 'name', 'mz' and 'rt'}
-
-\item{ms2.data}{A character containign the MS2 data in mgf format}
-
-\item{parameter.list}{A list containing the parameters to process each database.
-Parameters must be created using \link[metid:metIdentifyParam]{metid::metIdentifyParam}}
-}
-\value{
-A \link{mzIdentifyClass} object with the annotation results
-}
 \description{
-Function to identify metabolites using multiple databases at once. This
-function was modified from the package \href{https://github.com/tidymass/metid}{metid}
+Modified function to identify metabolites
 }

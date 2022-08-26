@@ -7,15 +7,15 @@
 mod_identify_all(ms1.data, ms2.data, db_dir, parameter.list)
 }
 \arguments{
-\item{ms1.data}{A \link{data.frame} with 3 columns: 'name', 'mz' and 'rt'}
+\item{ms1.data}{A \link{data.frame} containing the columns 'FeatureID', 'mzmed' and 'rtmed'}
 
-\item{ms2.data}{A character containign the MS2 data in mgf format}
+\item{ms2.data}{An \link{MSpectra} object containing MS2 data}
 
 \item{parameter.list}{A list containing the parameters to process each database.
-Parameters must be created using \link[metid:metIdentifyParam]{metid::metIdentifyParam}}
+Parameters must be created using \code{\link[metid:metIdentifyParam]{metid::metIdentifyParam()}}}
 }
 \value{
-A \link{mzIdentifyClass} object wth the annotation results
+A list of \link{mzIdentifyClass} objects with the annotation results
 }
 \description{
 Function to identify metabolites using multiple databases at once. This

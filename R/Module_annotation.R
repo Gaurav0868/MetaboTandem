@@ -239,14 +239,21 @@ dbAnnotationServer <- function(id, data_proc){
 
 
     observeEvent(input$get_table, {
-      tabname <- stringr::str_to_title(stringr::str_replace(selected_dbs(), '_db', 'Database'))
-      table_id <- stringr::str_replace(selected_dbs(), '_db', '_input')
+      tabname <- stringr::str_to_title(stringr::str_replace(selected_dbs(), '_db', ' Database'))
+      #table_id <- stringr::str_replace(selected_dbs(), '_db', '_output')
 
-      purrr::map2(tabname, table_id, function(x,y){
+      purrr::map2(tabname, selected_dbs(), function(x,y){
         insertTab(inputId = 'annot_tabs',
                   tabPanel(x,
                            dataTableOutput(ns(y))))
       })
+
+      for(res in selected_dbs()){
+        output[[res]] <- renderDataTable({
+          mod_get_identification_table(annotation()[[res]])
+        })
+
+      }
     })
 
 
