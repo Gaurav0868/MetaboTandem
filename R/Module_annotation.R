@@ -81,6 +81,8 @@ dbAnnotationUI <- function(id){
         uiOutput(ns('annotation_button')),
         uiOutput(ns('tables_button'))),
 
+    uiOutput(ns('annot_order')),
+
     uiOutput(ns('annot_box')),
     verbatimTextOutput(ns('test_annot'))
   )
@@ -224,6 +226,17 @@ dbAnnotationServer <- function(id, data_proc){
 
     }) %>%
       bindEvent(annotation())
+
+    output$annot_order <- renderUI({
+      box(title = 'Choose order of preference for annotations',
+          solidHeader = TRUE,
+          status = 'primary',
+          width = 12,
+          shinyjqui::orderInput(ns('dbs_order'),
+                                'Selected databases',
+                                items = selected_dbs())
+      )
+    })
 
     output$annot_box <- renderUI({
       box(title = 'Annotation Results',

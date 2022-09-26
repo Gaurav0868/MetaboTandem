@@ -91,7 +91,7 @@ read_msp <- function(file,
       }
 
       data[data == ""] <- c("END IONS_split_BEGIN IONS")
-      data <- unlist(str_split(data, '_split_'))
+      data <- unlist(stringr::str_split(data, '_split_'))
 
       begin_idx <- which(data == "BEGIN IONS")
       end_idx <- which(data == "END IONS")

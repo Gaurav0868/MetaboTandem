@@ -1,11 +1,11 @@
 Package: MetaboTandem
-Title: What the Package Does (One Line, Title Case)
+Title: Pipeline for the analysis of LC-MS/MS data
 Version: 0.0.0.9000
 Authors@R: 
     person("Christian", "Ayala-Ortiz", , "cayalaortiz@email.arizona.edu", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
+           comment = c(ORCID = "0000-0001-8154-2378"))
 biocViews: MassSpectrometry, DataAnalysis
-Description: What the package does (one paragraph).
+Description: MetaboTandem is a package and shiny app for the analysis, annotation and visualization of LC-MS/MS data
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -54,7 +54,9 @@ Imports:
     factoextra,
     colourpicker,
     pheatmap,
-    RColorBrewer
+    RColorBrewer,
+    shinyjqui,
+    shinydashboardPlus
 Suggests: 
     covr,
     knitr,

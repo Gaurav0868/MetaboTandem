@@ -76,6 +76,9 @@ MetaboTandemApp <- function(){
                              tabName = 'diff-exp',
                              icon = icon('expand-alt')),
                  startExpanded = TRUE),
+        menuItem('Results summary',
+                 tabName = 'res_summ',
+                 icon = icon('table')),
         menuItem('Results Download',
                  tabName = 'res',
                  icon = icon('download'),
@@ -131,6 +134,10 @@ MetaboTandemApp <- function(){
                 diffExpressionUI('diffexp')),
 
         ## Results tabs
+        tabItem(tabName = 'res_summ',
+                h1('Results summary'),
+                summaryUI('summ')),
+
         tabItem(tabName = 'res_preproc',
                 h1('Select data to download'),
                 download_ResultspreprocUI('dl_preproc'))
@@ -172,6 +179,10 @@ MetaboTandemApp <- function(){
     norm_df <- stastSetupServer('st_setup', data_gap_filled)
     multivariateServer('multi', norm_df, data$metadata, user_colors)
     diffExpressionServer('diffexp', norm_df, data$metadata)
+
+    # Summary results module
+    summaryServer('summ', data_gap_filled)
+
   }
 
   shinyApp(ui, server)
