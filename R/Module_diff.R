@@ -117,6 +117,14 @@ diffExpressionServer <- function(id, norm_df, metadata){
       diff_table()
     )
 
+    sig_features <- reactive({
+      used_p_val <- ifelse(input$p_adjust, 'pval.adj', 'pval')
+      diff_table() %>%
+        dplyr::select(FeatureID, pval = used_pval) %>%
+        dplyr::filter(pval < input$pval_t) %>%
+        dplyr::pull(FeatureID)
+    })
+
     volcano <- reactive({
 
       if(isTRUE(input$p_adjust)){
@@ -141,7 +149,7 @@ diffExpressionServer <- function(id, norm_df, metadata){
 
     hmp_matrix <- reactive({
       if(input$hmp_sig){
-        norm_df()[diff_table$FeatureID(),]
+        norm_df()[sig_features(),]
       } else {
         norm_df()
       }

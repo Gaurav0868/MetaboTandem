@@ -42,7 +42,8 @@ metadataServer <- function(id){
 
     output$metadata_table <- renderDataTable(
       metadata(),
-      options = list(scrollX = TRUE)
+      options = list(scrollX = TRUE,
+                     dom = 'ltip')
     )
     return(metadata)
   })

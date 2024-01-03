@@ -6,42 +6,57 @@
 
 peakPickingUI <- function(id){
   ns <- NS(id)
+
+  # Box to select PP method
   tagList(
-    h2('Peak picking parameters'),
-    p('Test parameters for peak picking using the',
-      strong('Test Parameters'),
-      'button.'),
-    p('Apply desired parameters to all data using the',
-      strong('Apply peak picking'),
-      'button.'),
-    fluidRow(
-      column(6,
-             numericInput(ns('noise'), 'Noise threshold', value = 1e6),
-             numericInput(ns('snt'), 'Signal-to-noise threshold', value = 3),
-             sliderInput(ns('p.width'), 'Peak Width',
-                         value = c(20, 50),
-                         min = 0,
-                         max = 100),
-             sliderInput(ns('rt_range'), 'Retention time range for testing [s]',
-                         value = c(0, 240),
-                         min = 0,
-                         max = 1200),
-             sliderInput(ns('mz_range'), 'Range of m/z for testing',
-                         value = c(100, 300),
-                         min = 0,
-                         max = 1200)),
-      column(6,
-             actionButton(ns('test'), 'Test Parameters'),
-             br(),
-             tableOutput(ns('params')),
-             br(), br(),
-             actionButton(ns('pick'), 'Apply peak picking',
-                          class = 'btn-lg btn-success'),
-             br(), br(),
-             verbatimTextOutput(ns('has_peaks')))
+
+    headerbox_factory(
+      title = 'Peak Picking Method',
+      status = 'info',
+      width = 12,
+      content = tagList(
+        selectInput(ns('pp_method'), 'Select method to use:',
+                    c('centWave' = 'cw',
+                      'Matched Filter' = 'mf',
+                      'Massifquant' = 'mq'))
+      )
     ),
-    waiter::use_waiter(),
-    plotOutput(ns('test_plot'))
+
+    # Parameters for selected PP method
+    uiOutput(ns('pp_params')),
+
+    headerbox_factory(
+      title = '',
+      status = 'success',
+      width = 6,
+      content = tagList(
+        uiOutput(ns('plot_pos')),
+        uiOutput(ns('table_pos')),
+        fluidRow(
+          column(6, align = 'center', offset = 3,
+                 shinyWidgets::actionBttn(ns('test'),
+                                          label = 'Test',
+                                          style = 'material-flat',
+                                          color = 'warning',
+                                          size = 'sm')
+                 )
+          ),
+        br(), br(),
+        fluidRow(
+          column(6, align = 'center', offset = 3,
+                 shinyWidgets::actionBttn(ns('pick'),
+                                          label = 'Pick peaks',
+                                          style = 'material-flat',
+                                          color = 'primary',
+                                          size = 'sm')
+          )
+        ),
+        fluidRow(
+          verbatimTextOutput(ns('has_peaks'))
+        )
+
+        )
+      )
   )
 }
 
@@ -58,24 +73,102 @@ peakPickingUI <- function(id){
 peakPickingServer <- function(id, data){
   moduleServer(id, function(input, output, session){
 
+    ns <- NS(id)
+    cw_params <- tagList(
+      h3('Method parameters'),
+      fluidRow(
+        column(6,
+               numericInput(ns('ppm'), 'Ppm threshold', value = 25),
+               numericInput(ns('snt'), 'Signal-to-noise threshold', value = 3),
+               numericInput(ns('p_width_min'), 'Min. peak width', value = 20),
+               numericInput(ns('pf_k'), 'Number of peaks for pre-filtering', value = 3, step = 1)),
+        column(6,
+               numericInput(ns('noise'), 'Noise threshold', value = 1e6),
+               numericInput(ns('mz_diff'), 'Mass difference for overlay peaks', value = 0.01),
+               numericInput(ns('p_width_max'), 'Max. peak width', value = 50),
+               numericInput(ns('pf_i'), 'Min. Intensity for prefiltering', value = 100))
+      )
+    )
+
+    mf_params <- tagList(
+      h3('Method parameters'),
+
+      fluidRow(
+        column(6,
+               numericInput(ns('bin'), 'Bin size', value = 0.1),
+               numericInput(ns('sigma'), 'sigma', value = 12.72),
+               numericInput(ns('steps'), 'Number of bins to be merged', value = 2, step = 1)),
+        column(6,
+               numericInput(ns('fwhm'), 'fwhm', value = 30),
+               numericInput(ns('max'), 'Max. peaks per slice', value = 10, step = 1))
+      )
+    )
+
+    subset_tags <- tagList(
+      hr(),
+      h3('Subsetting for testing parameters'),
+      sliderInput(ns('rt_range'), 'Retention time range for testing [s]',
+                  value = c(0, 240),
+                  min = 0,
+                  max = 1200),
+      sliderInput(ns('mz_range'), 'Range of m/z for testing',
+                  value = c(100, 300),
+                  min = 0,
+                  max = 1200)
+    )
+
+    output$pp_params <- renderUI({
+
+      if(input$pp_method != 'mf'){
+        cont <- c(cw_params,
+                  subset_tags)
+      } else {
+        cont <- c(mf_params,
+                  subset_tags)
+      }
+
+      headerbox_factory(
+        title = 'Method Parameters',
+        status = 'success',
+        content = cont
+      )
+    }) %>%
+      bindEvent(input$pp_method)
+
+
+
     params_df <- reactive({
       data.frame(Parameter = c('Noise threshold',
                                'Signal-to-noise ration threshold',
                                'Peak width'),
                  value = c(input$noise,
                            input$snt,
-                           paste0(input$p.width[1], '-', input$p.width[2])))
+                           paste0(input$p_width_min, '-', input$p_width_max)))
     }) %>%
       bindEvent(input$test)
 
     test_plot <- reactive({
       test_peak_picking(data$data_cent(),
-                        p.width = c(input$p.width[1], input$p.width[2]),
-                        mz.range = c(input$mz_range[1], input$mz_range[2]),
-                        rt.range = c(input$rt_range[1], input$rt_range[2]),
+                        p_width = c(input$p_width_min, input$p_width_max),
+                        mz_range = c(input$mz_range[1], input$mz_range[2]),
+                        rt_range = c(input$rt_range[1], input$rt_range[2]),
                         snt = input$snt,
                         noise = input$noise)
     }) %>%
+      bindEvent(input$test)
+
+    output$test_plot <- renderPlot(
+      test_plot()
+    )
+
+    output$plot_pos <- renderUI(
+      plotOutput(ns('test_plot'))
+    ) %>%
+      bindEvent(input$test)
+
+    output$table_pos <- renderUI(
+      tableOutput(ns('params'))
+    ) %>%
       bindEvent(input$test)
 
     output$test_plot <- renderPlot(
@@ -93,11 +186,21 @@ peakPickingServer <- function(id, data){
                                 duration = NULL, closeButton = FALSE)
       on.exit(removeNotification(notid), add = TRUE)
       apply_peak_picking(data$data_cent(),
-                         p.width = c(input$p.width[1], input$p.width[2]),
+                         method = input$pp_method,
+                         p_width = c(input$p_width_min, input$p_width_max),
                          snt = input$snt,
-                         noise = input$noise)
+                         noise = input$noise,
+                         ppm = input$ppm,
+                         prefilter = c(input$pf_k, input$pf_i),
+                         mz_diff = input$mz_diff,
+                         bin = input$bin,
+                         fwhm = input$fwhm,
+                         sigma = input$sigma,
+                         max = input$max,
+                         steps = input$steps)
     }) %>%
-      bindCache(input$p.width,
+      bindCache(input$p_width_min,
+                input$p_width_max,
                 input$snt,
                 input$noise) %>%
       bindEvent(input$pick)

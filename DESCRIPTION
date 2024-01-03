@@ -29,6 +29,7 @@ Imports:
     Rdisop,
     readr,
     scales,
+    Autotuner,
     shiny,
     shinyBS,
     shinydashboard,

@@ -13,150 +13,50 @@
 #' @import shinydashboardPlus
 #'
 #' @export
-
 MetaboTandemApp <- function(){
-  ui <- dashboardPage(
-    dashboardHeader(
-      title = tagList(
-        span(class = "logo-lg", "MetaboTandem"),
-        img(src = "logo.png")),
-      dropdownMenu(
-        type = 'notifications',
-        icon = icon('question-circle'),
-        headerText = 'Help',
-
-        notificationItem('Github Repository',
-                         icon = icon('github'),
-                         href = 'https://github.com/Coayala/MetaboTandem'),
-        notificationItem('User Guide',
-                         icon = icon('file'),
-                         href = 'https://github.com/Coayala/MetaboTandem')
-      )
+  ui <- tagList(
+    shinyjs::useShinyjs(),
+    div(id = 'home',
+        style = 'display:none',
+        home_ui
     ),
-
-    # Sidebar content
-    dashboardSidebar(
-      sidebarMenu(
-        menuItem('Data pre-processing',
-                 tabName = 'preproc',
-                 icon = icon('cogs'),
-                 menuSubItem('Load Data',
-                             tabName = 'load_data',
-                             icon = icon('upload')),
-                 menuSubItem('Peak picking',
-                             tabName = 'p_pick',
-                             icon = icon('check')),
-                 menuSubItem('Alignment & Correspondence',
-                             tabName = 'align',
-                             icon = icon('align-center')),
-                 menuSubItem('Gap Filling',
-                             tabName = 'gap',
-                             icon = icon('fill')),
-                 startExpanded = TRUE),
-        menuItem('Annotation',
-                 tabName = 'annot',
-                 icon = icon('tags'),
-                 menuSubItem('Public or custom databases',
-                             tabName = 'dbs_annot',
-                             icon = icon('database')),
-                 menuSubItem('Using SIRIUS',
-                             tabName = 'sirius_annot',
-                             icon = icon('computer')),
-                 startExpanded = TRUE),
-        menuItem('Statistical Analysis',
-                 tabName = 'stat',
-                 icon = icon('chart-line'),
-                 menuSubItem('Setup',
-                             tabName = 'stats-setup',
-                             icon = icon('tasks')),
-                 menuSubItem('Multivariate analysis',
-                             tabName = 'stats-mult',
-                             icon = icon('chart-bar')),
-                 menuSubItem('Differential expression',
-                             tabName = 'diff-exp',
-                             icon = icon('expand-alt')),
-                 startExpanded = TRUE),
-        menuItem('Results summary',
-                 tabName = 'res_summ',
-                 icon = icon('table')),
-        menuItem('Results Download',
-                 tabName = 'res',
-                 icon = icon('download'),
-                 menuSubItem('Pre-processing Tables',
-                             tabName = 'res_preproc',
-                             icon = icon('file-download')))
-      )
+    div(id = 'database_app',
+        style = 'display:none',
+        database_appUI
     ),
-
-    # Body content
-    dashboardBody(
-      tags$head(
-        tags$style(HTML("
-      #sidebarItemExpanded > ul > :last-child {
-        position: absolute;
-        bottom: 0;
-        width: 100%;
-        background-color: steelblue;
-      }
-
-    "))),
-      tabItems(
-        # Load data tab
-
-        ## Pre-processing tabs
-        tabItem(tabName = 'load_data',
-                h1('Load your data'),
-                load_dataUI('load_data')),
-        tabItem(tabName = 'p_pick',
-                h1('Peak Picking'),
-                peakPickingUI('p_pick')),
-        tabItem(tabName = 'align',
-                h1('Spectra alignment'),
-                alignSpectraUI('align')),
-        tabItem(tabName = 'gap',
-                h1('Gap Filling'),
-                gapFillingUI('gap')),
-
-        ## Annotation module
-        tabItem(tabName = 'dbs_annot',
-                h1('Annotation using custom or public databases'),
-                dbAnnotationUI('annot_dbs')),
-
-        ## Statistical analysis
-        tabItem(tabName = 'stats-setup',
-                h1('Set options for statistical analysis'),
-                statsSetupUI('st_setup')),
-        tabItem(tabName = 'stats-mult',
-                h1('Multivariate Analysis'),
-                multivariateUI('multi')),
-        tabItem(tabName = 'diff-exp',
-                h1('Differential Analysis'),
-                diffExpressionUI('diffexp')),
-
-        ## Results tabs
-        tabItem(tabName = 'res_summ',
-                h1('Results summary'),
-                summaryUI('summ')),
-
-        tabItem(tabName = 'res_preproc',
-                h1('Select data to download'),
-                download_ResultspreprocUI('dl_preproc'))
-      )
+    div(id = 'main_pipeline',
+        style = 'display:none',
+        ui_main()
     ),
-
-    # Sidebar contet
-    dashboardControlbar(
-      br(),
-      box(
-        title = 'Color palette selector',
-        solidHeader = TRUE,
-        width = 12,
-        colorPickerUI('side')
-      )
+    div(id = 'autotuner_app',
+        style = 'display:none',
+        autotunerUI('use_autotuner')
     )
   )
 
   server <- function(input, output, session) {
+    shinyjs::show('home')
+
+
+    observeEvent({input$goHome_database; input$goDatabase}, {
+      shinyjs::toggle('database_app')
+      shinyjs::toggle('home')
+
+    })
+
+    observeEvent({input$goHome_main; input$goMain}, {
+      shinyjs::toggle('main_pipeline')
+      shinyjs::toggle('home')
+    })
+
+    observeEvent({input$goHome_autotuner; input$goAutotuner}, {
+      shinyjs::toggle('autotuner_app')
+      shinyjs::toggle('home')
+    })
+
+    # Autotuner server
+
+    autotunerServer('use_autotuner')
 
     # Pre-processing modules
 
@@ -174,6 +74,7 @@ MetaboTandemApp <- function(){
 
     # Annotation
     dbAnnotationServer('annot_dbs', data_gap_filled)
+    siriusAnnotationServer('annot_sirius', data_gap_filled)
 
     # Statistical analysis module
     norm_df <- stastSetupServer('st_setup', data_gap_filled)
@@ -181,7 +82,7 @@ MetaboTandemApp <- function(){
     diffExpressionServer('diffexp', norm_df, data$metadata)
 
     # Summary results module
-    summaryServer('summ', data_gap_filled)
+    summaryServer('summ', data_gap_filled, data_cent)
 
   }
 

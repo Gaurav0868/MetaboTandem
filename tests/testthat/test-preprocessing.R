@@ -55,3 +55,5 @@ test_that('alignment and correspondence work', {
   expect_true(xcms::hasFeatures(data_grouped))
 
 })
+
+

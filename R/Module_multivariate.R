@@ -28,14 +28,14 @@ multivariateUI <- function(id){
       title = 'NMDS',
       solidHeader = TRUE,
       status = 'primary',
-      plotOutput(ns('stress')),
+      #plotOutput(ns('stress')),
       plotOutput(ns('nmds'))
     ),
     box(
       title = 'PCA',
       solidHeader = TRUE,
       status = 'primary',
-      plotOutput(ns('scree')),
+      #plotOutput(ns('scree')),
       plotOutput(ns('PCA'))
     ),
     box(
@@ -77,10 +77,10 @@ multivariateServer <- function(id, norm_df, metadata, user_colors){
 
     # Calculate outputs
 
-    output$stress <- renderPlot(
-      vegan::stressplot(nmds_ord()$nmds)
-    ) %>%
-      bindEvent(nmds_ord())
+    # output$stress <- renderPlot(
+    #   vegan::stressplot(nmds_ord()$nmds)
+    # ) %>%
+    #   bindEvent(nmds_ord())
 
     output$nmds <- renderPlot({
       if(input$label){
@@ -96,6 +96,7 @@ multivariateServer <- function(id, norm_df, metadata, user_colors){
         nmds_plot +
           scale_color_manual(values = user_colors())
       }
+
     }) %>%
       bindEvent(nmds_ord())
 
