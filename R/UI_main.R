@@ -15,23 +15,9 @@
 #' @export
 ui_main <- function(){
   dashboardPage(
-    dashboardHeader(
-      title = tagList(
-        span(class = "logo-lg", "MetaboTandem"),
-        img(src = "logo.png")),
-      dropdownMenu(
-        type = 'notifications',
-        icon = icon('question-circle'),
-        headerText = 'Help',
 
-        notificationItem('Github Repository',
-                         icon = icon('github'),
-                         href = 'https://github.com/Coayala/MetaboTandem'),
-        notificationItem('User Guide',
-                         icon = icon('file'),
-                         href = 'https://github.com/Coayala/MetaboTandem')
-      )
-    ),
+    # Header
+    app_header(),
 
     # Sidebar content
     dashboardSidebar(
