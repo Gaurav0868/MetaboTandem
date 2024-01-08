@@ -38,7 +38,7 @@ annotate_CAMERA <- function(data, group_by){
 #'@param ms2.data An [MSpectra] object containing MS2 data
 #'@param db_dir Path where the databases are stored
 #'@param parameter.list A list containing the parameters to process each database.
-#'Parameters must be created using [metid::metIdentifyParam()]
+#'Parameters must be created using metid::metIdentifyParam()
 #'
 #'@return A list of [mzIdentifyClass] objects with the annotation results
 #'

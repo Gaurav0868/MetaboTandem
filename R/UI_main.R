@@ -22,6 +22,8 @@ ui_main <- function(){
     # Sidebar content
     dashboardSidebar(
       sidebarMenu(
+
+        # Button to go back home
         fluidRow(
           column(6, align = 'center', offset = 3,
                  shinyWidgets::actionBttn(inputId = 'goHome_main',
@@ -30,6 +32,8 @@ ui_main <- function(){
                                           color = 'success',
                                           size = 'sm'))
         ),
+
+        # Left side items to select the different steps of the pipeline
         menuItem('Data pre-processing',
                  tabName = 'preproc',
                  icon = icon('cogs'),
@@ -94,7 +98,10 @@ ui_main <- function(){
 
     "))),
       tabItems(
+
         # Load data tab
+
+        # Change between tabs
 
         ## Pre-processing tabs
         tabItem(tabName = 'load_data',
