@@ -16,7 +16,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Christian Ayala-Ortiz \email{cayalaortiz@email.arizona.edu} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})
+\strong{Maintainer}: Christian Ayala-Ortiz \email{cayalaortiz@email.arizona.edu} (\href{https://orcid.org/0000-0001-8154-2378}{ORCID})
 
 }
 \keyword{internal}

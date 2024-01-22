@@ -7,7 +7,7 @@
 autotunerUI <- function(id){
   ns <- NS(id)
   dashboardPage(
-    dashboardHeader(),
+    app_header(),
     dashboardSidebar(
       fluidRow(
         column(6, align = 'center', offset = 3,

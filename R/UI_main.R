@@ -15,27 +15,15 @@
 #' @export
 ui_main <- function(){
   dashboardPage(
-    dashboardHeader(
-      title = tagList(
-        span(class = "logo-lg", "MetaboTandem"),
-        img(src = "logo.png")),
-      dropdownMenu(
-        type = 'notifications',
-        icon = icon('question-circle'),
-        headerText = 'Help',
 
-        notificationItem('Github Repository',
-                         icon = icon('github'),
-                         href = 'https://github.com/Coayala/MetaboTandem'),
-        notificationItem('User Guide',
-                         icon = icon('file'),
-                         href = 'https://github.com/Coayala/MetaboTandem')
-      )
-    ),
+    # Header
+    app_header(),
 
     # Sidebar content
     dashboardSidebar(
       sidebarMenu(
+
+        # Button to go back home
         fluidRow(
           column(6, align = 'center', offset = 3,
                  shinyWidgets::actionBttn(inputId = 'goHome_main',
@@ -43,7 +31,13 @@ ui_main <- function(){
                                           style = 'material-circle',
                                           color = 'success',
                                           size = 'sm'))
-        ),id='sidebarID',
+
+        ),
+        
+        id='sidebarID',
+
+        # Left side items to select the different steps of the pipeline
+
         menuItem('Data pre-processing',
                  tabName = 'preproc',
                  icon = icon('cogs'),
@@ -108,7 +102,10 @@ ui_main <- function(){
 
     "))),
       tabItems(
+
         # Load data tab
+
+        # Change between tabs
 
         ## Pre-processing tabs
         tabItem(tabName = 'load_data',
