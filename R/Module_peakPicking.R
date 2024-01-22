@@ -13,7 +13,7 @@ peakPickingUI <- function(id){
     headerbox_factory(
       title = 'Peak Picking Method',
       status = 'info',
-      width = 12,
+      width = 6,
       content = tagList(
         selectInput(ns('pp_method'), 'Select method to use:',
                     c('centWave' = 'cw',
@@ -28,7 +28,7 @@ peakPickingUI <- function(id){
     headerbox_factory(
       title = '',
       status = 'success',
-      width = 6,
+      width = 12,
       content = tagList(
         uiOutput(ns('plot_pos')),
         uiOutput(ns('table_pos')),
@@ -77,14 +77,16 @@ peakPickingServer <- function(id, data){
     cw_params <- tagList(
       h3('Method parameters'),
       fluidRow(
-        column(6,
+        column(3,
                numericInput(ns('ppm'), 'Ppm threshold', value = 25),
-               numericInput(ns('snt'), 'Signal-to-noise threshold', value = 3),
+               numericInput(ns('snt'), 'Signal-to-noise threshold', value = 3)),
+        column(3,
                numericInput(ns('p_width_min'), 'Min. peak width', value = 20),
                numericInput(ns('pf_k'), 'Number of peaks for pre-filtering', value = 3, step = 1)),
-        column(6,
+        column(3,
                numericInput(ns('noise'), 'Noise threshold', value = 1e6),
-               numericInput(ns('mz_diff'), 'Mass difference for overlay peaks', value = 0.01),
+               numericInput(ns('mz_diff'), 'Mass difference for overlay peaks', value = 0.01)),
+        column(3,
                numericInput(ns('p_width_max'), 'Max. peak width', value = 50),
                numericInput(ns('pf_i'), 'Min. Intensity for prefiltering', value = 100))
       )
@@ -129,6 +131,7 @@ peakPickingServer <- function(id, data){
 
       headerbox_factory(
         title = 'Method Parameters',
+        width = 12,
         status = 'success',
         content = cont
       )
