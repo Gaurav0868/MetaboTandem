@@ -61,7 +61,7 @@ spectraUI <- function(id){
     waiter::use_waiter(),
     h2('Select data directory'),
     shinyDirButton(ns('datadir'), 'Choose data folder',
-                      'Please select folder with data',
+                   'Please select folder with data',
                    FALSE),
     br(),
     verbatimTextOutput(ns('sel_directory')),
@@ -69,7 +69,9 @@ spectraUI <- function(id){
     selectInput(ns('format'), 'Data format', c('mzML', 'mzXML')),
     br(),
     verbatimTextOutput(ns('is_loaded')),
-    actionButton(ns('load'), 'Load Data', class = 'btn-primary')
+    actionButton(ns('load'), 'Load Data', class = 'btn-primary'),
+    uiOutput(ns('next_button'))
+
   )
 }
 
@@ -82,6 +84,8 @@ spectraUI <- function(id){
 
 spectraServer <- function(id, metadata){
   moduleServer(id, function(input, output, session){
+
+
 
     #volumes <- getVolumes()
 
@@ -108,6 +112,30 @@ spectraServer <- function(id, metadata){
                                transform = TRUE))
     })
 
+    output$next_button <- renderUI({
+      if(is(data_cent(), 'OnDiskMSnExp')){
+        tagList(
+        actionButton(inputId = 'next_button',
+                     label = 'Next',
+                     icon = icon('arrow-right')))
+      }
+    })
+
+    output$back_button <- renderUI({
+        tagList(
+          actionButton(inputId = 'back_button',
+                       label = 'Back',
+                       icon = icon('arrow-left')))
+
+    })
+    # observe({
+    #   req(input$next_button)
+    #   updateTabItems(session, "sidebarID", "p_pick")
+    #
+    # })
+
+
+
     output[['is_loaded']] <- renderText({
       if(is(data_cent(), 'OnDiskMSnExp')){
         'Data loaded correctly'
@@ -115,6 +143,9 @@ spectraServer <- function(id, metadata){
         'Please load your data'
       }
     })
+
+
+
 
     return(data_cent)
   })
@@ -142,6 +173,7 @@ load_dataUI <- function(id){
     ),
     box(
       spectraUI(ns('spectra'))
+
     )
   )
 
@@ -161,6 +193,11 @@ load_dataServer <- function(id){
   moduleServer(id, function(input, output, session){
     metadata <- metadataServer('metadata')
     data_cent <- spectraServer('spectra', metadata)
+
+    ##
+
+    ##
+
 
     return(
       list(data_cent = data_cent,

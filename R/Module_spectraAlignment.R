@@ -30,16 +30,20 @@ alignSpectraUI <- function(id){
              br(),
              actionButton(ns('align'), 'Apply Alignment and Correspondence',
                           class = 'btn-lg btn-success')
-             ),
+      ),
       column(6,
              plotOutput(ns('aling_plot'))
-             )
+      )
     ),
     verbatimTextOutput(ns('is_aligned')),
     br(),
     verbatimTextOutput(ns('is_grouped')),
     br(),
-    plotOutput(ns('align_plot'))
+    plotOutput(ns('align_plot')),
+    uiOutput(ns('next_buttonSA')),
+    actionButton(inputId = 'back_buttonSA',
+                 label = 'Back',
+                 icon = icon('arrow-left'))
   )
 }
 
@@ -68,14 +72,14 @@ alignSpectraServer <- function(id, metadata, data_pp){
     output$align_plot <- renderPlot({
       color_vector <- create_col_vector(metadata(), color_by = input$group)
       xcms::plotAdjustedRtime(data_aligned(),
-                        col = color_vector,
-                        xlab="Retention Time (sec)",
-                        font.lab=2,
-                        cex.lab=2,
-                        cex.axis=2,
-                        font.main=2,
-                        cex.main=2,
-                        lwd=2)
+                              col = color_vector,
+                              xlab="Retention Time (sec)",
+                              font.lab=2,
+                              cex.lab=2,
+                              cex.axis=2,
+                              font.main=2,
+                              cex.main=2,
+                              lwd=2)
       legend("topright",
              legend = unique(names(color_vector)),
              col = unique(color_vector), lty=1)
@@ -117,6 +121,22 @@ alignSpectraServer <- function(id, metadata, data_pp){
       } else {
         'Please apply peak picking'
       }
+
+    })
+
+    output$next_buttonSA <- renderUI({
+      if(is(data_grouped(), 'XCMSnExp')){
+        if(xcms::hasFeatures(data_grouped())){
+          actionButton('next_buttonSA', 'Next', class = 'btn-lg btn-success')
+        }
+      }
+    })
+
+    output$back_buttonSA <- renderUI({
+      tagList
+      actionButton(inputId = 'back_buttonSA',
+                   label = 'Back',
+                   icon = icon('arrow-left'))
 
     })
 

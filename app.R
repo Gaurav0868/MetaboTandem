@@ -1,4 +1,4 @@
-#' MetaboTandem UI
+#MetaboTandem UI
 #'
 #' UI for MetaboTandem pipeline
 #'
@@ -35,55 +35,6 @@ MetaboTandemApp <- function(){
   )
 
   server <- function(input, output, session) {
-
-
-    ##
-    ##Next button logic in loadData
-    observeEvent(input$next_button ,{
-      updateTabItems(session, "sidebarID", "p_pick")
-    })
-
-    #next button logic in peak picking
-
-    observeEvent(input$next_buttonPP ,{
-      updateTabItems(session, "sidebarID", "align")
-    })
-    #next button logic in align
-    observeEvent(input$next_buttonSA ,{
-      updateTabItems(session, "sidebarID", "gap")
-    })
-
-
-
-    #backbutton logic in peak picking
-    observeEvent(input$back_buttonPP ,{
-      updateTabItems(session, "sidebarID", "load_data")
-    })
-
-    #back button logic in spectra align
-    observeEvent(input$back_buttonSA,{
-      updateTabItems(session, "sidebarID", "p_pick")
-    })
-
-    #back button logic in gap filling
-    observeEvent(input$back_buttonGF ,{
-      updateTabItems(session, "sidebarID", "align")
-    })
-
-
-    #go_to_AnnotationLogic
-
-    observeEvent(input$Go_to_Annotation ,{
-      updateTabItems(session, "sidebarID", "dbs_annot")
-    })
-
-
-    #go_to_StatisticalAnalysisLogic
-    observeEvent(input$Go_to_StatisticalAnalysis ,{
-      updateTabItems(session, "sidebarID", "stats-setup")
-    })
-
-    ##
     shinyjs::show('home')
 
 

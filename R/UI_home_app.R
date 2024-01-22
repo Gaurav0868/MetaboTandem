@@ -74,6 +74,7 @@ home_ui <- dashboardPage(
                                             color = 'default',
                                             style = 'jelly',
                                             size = 'lg'))
+            #this is were box is made active to go to database
           )
       ),
       box(title = 'Annotate MGF',

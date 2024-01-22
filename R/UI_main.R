@@ -43,7 +43,7 @@ ui_main <- function(){
                                           style = 'material-circle',
                                           color = 'success',
                                           size = 'sm'))
-        ),
+        ),id='sidebarID',
         menuItem('Data pre-processing',
                  tabName = 'preproc',
                  icon = icon('cogs'),
@@ -113,15 +113,19 @@ ui_main <- function(){
         ## Pre-processing tabs
         tabItem(tabName = 'load_data',
                 h1('Load your data'),
+                actionButton("Next1", "Next",icon =icon ('arrow-right')),
                 load_dataUI('load_data')),
+
         tabItem(tabName = 'p_pick',
                 h1('Peak Picking'),
                 peakPickingUI('p_pick')),
         tabItem(tabName = 'align',
                 h1('Spectra alignment'),
+                #actionButton("Next3", "Next",icon =icon ('arrow-right'),disabled = TRUE),
                 alignSpectraUI('align')),
         tabItem(tabName = 'gap',
                 h1('Gap Filling'),
+                #actionButton("Next4", "Next",icon =icon ('arrow-right'),disabled = TRUE),
                 gapFillingUI('gap')),
 
         ## Annotation module

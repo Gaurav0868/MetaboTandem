@@ -33,30 +33,41 @@ peakPickingUI <- function(id){
         uiOutput(ns('plot_pos')),
         uiOutput(ns('table_pos')),
         fluidRow(
-          column(6, align = 'center', offset = 3,
+          column(4, align = 'center', offset = 3,
                  shinyWidgets::actionBttn(ns('test'),
                                           label = 'Test',
                                           style = 'material-flat',
                                           color = 'warning',
                                           size = 'sm')
-                 )
-          ),
+          )
+        ),
         br(), br(),
         fluidRow(
-          column(6, align = 'center', offset = 3,
+          column(4, align = 'center', offset = 3,
                  shinyWidgets::actionBttn(ns('pick'),
                                           label = 'Pick peaks',
                                           style = 'material-flat',
                                           color = 'primary',
                                           size = 'sm')
+
           )
-        ),
+        ),br(),
+
+        #NextButton
+        uiOutput(ns('next_buttonPP')),
+
+        #BackButton
+
+        actionButton(inputId = 'back_buttonPP',
+                     label = 'Back',
+                     icon = icon('arrow-left')),
+
         fluidRow(
           verbatimTextOutput(ns('has_peaks'))
         )
 
-        )
       )
+    )
   )
 }
 
@@ -89,6 +100,9 @@ peakPickingServer <- function(id, data){
                numericInput(ns('pf_i'), 'Min. Intensity for prefiltering', value = 100))
       )
     )
+
+
+
 
     mf_params <- tagList(
       h3('Method parameters'),
@@ -217,6 +231,53 @@ peakPickingServer <- function(id, data){
       }
 
     })
+
+
+
+    # output$next_buttonPP <- renderUI({
+    #   if(is(data_cent_pp(), 'XCMSnExp')){
+    #     tagList(
+    #       actionButton(inputId = 'next_buttonPP',
+    #                    label = 'Next',
+    #                    icon = icon('arrow-right')))
+    #   }
+    # })
+
+    output$next_buttonPP <- renderUI({
+      if(is(data_cent_pp(), 'XCMSnExp')){
+        if(xcms::hasChromPeaks(data_cent_pp())){
+          tagList(
+            actionButton(inputId = 'next_buttonPP',
+                         label = 'Next',
+                         icon = icon('arrow-right')))
+        }
+      }
+    })
+
+
+
+
+
+
+    # output$next_buttonPP <- renderUI({
+    #   if(is(data_cent_pp(), 'XCMSnExp')){
+    #     if(xcms::hasChromPeaks(data_cent_pp())){
+    #       actionButton(ns('next_buttonPP'), 'Next')
+    #     }
+    #   }
+    #
+    # })
+
+
+
+
+
+
+    observe({
+        req(input$next_buttonPP)
+        updateTabItems(session, "sidebarID", "align")
+
+      })
 
     return(data_cent_pp)
 
