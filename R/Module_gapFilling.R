@@ -16,7 +16,15 @@ gapFillingUI <- function(id){
     h2('After Gap Filling'),
     plotOutput(ns('gap_filled_plot')),
     tableOutput(ns('num_filled')),
-    verbatimTextOutput(ns('is_gap_filled'))
+    verbatimTextOutput(ns('is_gap_filled')),
+
+    #back Button
+    actionButton(inputId = 'back_buttonGF',
+                 label = 'Back',
+                 icon = icon('arrow-left')),
+
+    uiOutput(ns('Go_to_Annotation')),
+    uiOutput(ns('Go_to_StatisticalAnalysis'))
   )
 }
 
@@ -97,6 +105,39 @@ gapFillingServer <- function(id, data_grouped){
               legend.position = 'bottom',
               legend.title = element_blank())
     )
+
+    output$Go_to_Annotation <- renderUI({
+
+      if (is.null(data_gap_filled())) return()
+      tagList(
+        actionButton(inputId = 'Go_to_Annotation',
+                     label = 'Go to Annotation',
+                     icon = icon('arrow-right'))
+      )
+
+    })
+
+
+
+
+    output$Go_to_StatisticalAnalysis <- renderUI({
+
+      if (is.null(data_gap_filled())) return()
+      tagList(
+        actionButton(inputId = 'Go_to_StatisticalAnalysis',
+                     label = 'Go to Statistical Analysis',
+                     icon = icon('arrow-right'))
+      )
+
+    })
+
+    observe({
+      req(input$Go_to_Annotation)
+      updateTabItems(session, "sidebarID", "align")
+
+    })
+
+
 
     return(data_gap_filled)
 
