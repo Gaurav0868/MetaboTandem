@@ -122,17 +122,3 @@ home_ui <- dashboardPage(
   )
 )
 
-# REMOVE
-test_appUI <- dashboardPage(
-  dashboardHeader(),
-  dashboardSidebar(),
-  dashboardBody(
-    shinyWidgets::actionBttn(
-      inputId = 'goHome_autotuner',
-      label = 'Return Home',
-      style = 'material-flat',
-      color = 'success'
-    )
-  )
-)
-

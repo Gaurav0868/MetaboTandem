@@ -18,6 +18,8 @@ read_mgf <- function(file,
 
       begin_idx <- which(data == "BEGIN IONS")
       end_idx <- which(data == "END IONS")
+      names <- data[which(stringr::str_detect(data, 'TITLE'))] %>%
+        stringr::str_remove(., 'TITLE=')
 
       data <- purrr::map2(
         .x = begin_idx,
@@ -52,8 +54,15 @@ read_mgf <- function(file,
           list(info = info, spec = spec)
         }
       )
+
+      names(data) <- names
+
+      return(data)
+
     }, .progress = TRUE
   )
+
+
 
   db <- Reduce(`c`, db)
   print('Finished reading db')
