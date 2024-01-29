@@ -38,9 +38,13 @@ MetaboTandemApp <- function(){
     div(id = 'autotuner_app',
         style = 'display:none',
         autotunerUI('use_autotuner')
-    )
+    ),
 
-    # TODO Add MGF annotation mode
+    # MGF annotation mode
+    div(id = 'annotate_app',
+        style = 'display:none',
+        annotationappUI('solo_annotation')
+    )
   )
 
   server <- function(input, output, session) {
@@ -59,8 +63,6 @@ MetaboTandemApp <- function(){
     observeEvent(input$next_buttonSA ,{
       updateTabItems(session, "sidebarID", "gap")
     })
-
-
 
     #backbutton logic in peak picking
     observeEvent(input$back_buttonPP ,{
@@ -110,7 +112,14 @@ MetaboTandemApp <- function(){
       shinyjs::toggle('home')
     })
 
-    # TODO Add MGF annotation mode
+    observeEvent({input$goHome_annot; input$goAnnotate}, {
+      shinyjs::toggle('annotate_app')
+      shinyjs::toggle('home')
+    })
+
+    # Running the MGF annotation module
+
+    dbAnnotationServer('solo_annotation', new_data = TRUE)
 
     # Running the Autotuner server
 

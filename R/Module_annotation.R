@@ -7,28 +7,17 @@
 dbAnnotationUI <- function(id){
   ns <- NS(id)
   tagList(
-    h2('Data for annotation'),
-    shinyWidgets::radioGroupButtons(ns('data_annot'),
-                                    label = 'Select dataset',
-                                    choiceNames = c('Current data set',
-                                                    'Load new data set'),
-                                    choiceValues = c('current_data',
-                                                     'new_data'),
-                                    checkIcon = list(
-                                      yes = tags$i(class = "fa fa-check-square",
-                                                   style = "color: steelblue"),
-                                      no = tags$i(class = "fa fa-square-o",
-                                                  style = "color: steelblue"))),
     uiOutput(ns('load_new_data')),
     br(),
-    h2('Annotation databases'),
-    shinyDirButton(ns('db_dir'), "Directory with databases",
-                   'Select directory'),
-    verbatimTextOutput(ns('db_dir_path')),
 
-    box(title = 'Select databases for annotation',
-        solidHeader = TRUE,
-        status = 'primary',
+    headerbox_factory(
+      title = 'Select databases for annotation',
+      status = 'primary',
+      width = 6,
+      content = tagList(
+        shinyDirButton(ns('db_dir'), "Directory with databases",
+                       'Select directory'),
+        hr(),
         shinyWidgets::materialSwitch(ns('use_custom'),
                                      label = 'Custom Database',
                                      value = FALSE,
@@ -56,12 +45,15 @@ dbAnnotationUI <- function(id){
                                      right = TRUE),
         actionButton(ns('set_dbs'), 'Set databases'),
         hr(),
-        verbatimTextOutput(ns('n_dbs'))
+        textOutput(ns('n_dbs'))
+      )
     ),
 
-    box(title = 'Annotation options',
-        solidHeader = TRUE,
-        status = 'primary',
+    headerbox_factory(
+      title = 'Annotation options',
+      status = 'info',
+      width = 6,
+      content = tagList(
         selectInput(ns('polarity'),
                     label = 'Polarity',
                     choices = c('positive', 'negative')),
@@ -74,17 +66,13 @@ dbAnnotationUI <- function(id){
                      step = 1,
                      value = 1),
         br(),
-        actionButton(ns('extract'), 'Extract MS2'),
-        br(),
-        verbatimTextOutput(ns('ms2_data_check')),
-        br(),
-        uiOutput(ns('annotation_button')),
-        uiOutput(ns('tables_button'))),
+        uiOutput(ns('annotation_button'))
+      )
+    ),
 
-    uiOutput(ns('annot_order')),
+    #uiOutput(ns('annot_order')),
 
-    uiOutput(ns('annot_box')),
-    verbatimTextOutput(ns('test_annot'))
+    uiOutput(ns('annot_box'))
   )
 }
 
@@ -94,59 +82,70 @@ dbAnnotationUI <- function(id){
 #' @param ms1_data A [data.frame] with columns: 'name', 'mz' and 'rt'
 #'
 
-dbAnnotationServer <- function(id, data_proc){
+dbAnnotationServer <- function(id, data_proc, new_data = FALSE){
   moduleServer(id, function(input, output, session){
     ns <- NS(id)
 
     # Check if new data is required
 
     output$load_new_data <- renderUI({
-      if(input$data_annot == 'new_data'){
-        box(title = 'Select new data',
-            solidHeader = TRUE,
-            width = 12,
-            status = 'primary',
-            shinyFilesButton(ns('new_features_df'),
-                             'Choose feature table (MS1 data)',
-                             'Please select file',
-                             FALSE),
-            br(),
-            verbatimTextOutput(ns('new_features_df_file')),
-            br(),
-            br(),
-            shinyFilesButton(ns('new_mgf'),
-                             'Choose mgf file (MS2 spectra)',
-                             'Please select file',
-                             FALSE),
-            br(),
-            verbatimTextOutput(ns('new_mgf_file'))
+      if(new_data == TRUE){
+        tagList(
+          h2('Annotation App'),
+          headerbox_factory(title = 'Select new data',
+                            width = 12,
+                            status = 'primary',
+                            content = tagList(
+                              fileInput(ns('new_features_df'),
+                                        'Upload MS1 data (feature table)',
+                                        accept = c('.csv', '.tsv')),
+                              hr(),
+                              fileInput(ns('new_mgf_file'),
+                                        'Upload MS2 data (mgf file)',
+                                        accept = c('.mgf')),
+                            )
+
+          )
         )
 
       }
     })
 
-    shinyFileChoose(input, 'new_features_df',
-                    roots = c('wd' = '.'), session = session)
-    feature_file <- reactive({parseFilePaths(roots = c('wd' = '.'),
-                                             input$new_features_df)})
+    options(shiny.maxRequestSize=30*1024^2)
+    if(new_data == TRUE){
+      feature_table <- reactiveVal()
 
-    shinyFileChoose(input, 'new_mgf',
-                    roots = c('wd' = '.'), session = session)
-    mgf_file <- reactive({parseFilePaths(roots = c('wd' = '.'),
-                                         input$new_mgf)})
+      observe({
+        req(input$new_features_df)
+
+        ext <- tools::file_ext(input$new_features_df$name)
+        if(ext == 'csv'){
+          feature_table(vroom::vroom(input$new_features_df$datapath, delim = ","))
+        } else if(ext == 'tsv'){
+          feature_table(vroom::vroom(input$new_features_df$datapath, delim = "\t"))
+        } else{
+          validate("Invalid file; Please upload a .csv or .tsv file")
+        }
+      })
+
+      ms2_data <- reactiveVal()
+
+      observe({
+        req(input$new_mgf_file)
+
+        ext <- tools::file_ext(input$new_mgf_file$name)
+        if(ext == 'mgf'){
+          ms2_data(read_mgf(input$new_mgf_file$datapath))
+        } else{
+          validate("Invalid file; Please upload a MGF file")
+        }
+      })
+    }
 
     shinyDirChoose(input, 'db_dir',
                    roots = c('wd' = '.'), session = session)
     db_dir <- reactive({parseDirPath(roots = c('wd' = '.'),
                                      input$db_dir)})
-
-    output$new_features_df_file <- renderPrint({
-      paste('Selected MS1 data: ', feature_file()[1])
-    })
-
-    output$new_mgf_file <- renderPrint({
-      paste('Selected MS2 data: ', mgf_file()[1])
-    })
 
     output$db_dir_path <- renderPrint({
       paste('Database directory: ', db_dir())
@@ -154,30 +153,25 @@ dbAnnotationServer <- function(id, data_proc){
 
     # Annotate data using selected databases
 
-    ms1.data <- reactive({
-      ms1.data <- extract_features(data_proc()) %>%
-        extract_feature_definition(data_proc(), feature_abundance = .)
-    }) %>%
-      bindEvent(input$extract)
-
-    ms2.data <- reactive({
-      notid <- showNotification('Extracting MS2...',
-                                duration = NULL, closeButton = FALSE)
-      on.exit(removeNotification(notid), add = TRUE)
-      suppressWarnings(extract_MS2_consensus(data_proc()))
-    }) %>%
-      bindEvent(input$extract)
-
-    output$ms2_data_check <- renderPrint({
-      if(is(ms2.data(), 'MSpectra')){
-        'MS2 data extracted succesfully'
-      }
-    })
-
-    output$annotation_button <- renderUI({
-      actionButton(ns('annotate'), 'Start Annotation')
-    }) %>%
-      bindEvent(ms2.data())
+    # ms1.data <- reactive({
+    #   ms1.data <- extract_features(data_proc()) %>%
+    #     extract_feature_definition(data_proc(), feature_abundance = .)
+    # }) %>%
+    #   bindEvent(input$extract)
+    #
+    # ms2.data <- reactive({
+    #   notid <- showNotification('Extracting MS2...',
+    #                             duration = NULL, closeButton = FALSE)
+    #   on.exit(removeNotification(notid), add = TRUE)
+    #   suppressWarnings(extract_MS2_consensus(data_proc()))
+    # }) %>%
+    #   bindEvent(input$extract)
+    #
+    # output$ms2_data_check <- renderPrint({
+    #   if(is(ms2.data(), 'MSpectra')){
+    #     'MS2 data extracted succesfully'
+    #   }
+    # })
 
     available_dbs <- c('custom_db', 'gnps_db', 'massbank_db', 'mona_db', 'hmdb_db')
 
@@ -214,28 +208,20 @@ dbAnnotationServer <- function(id, data_proc){
     }) %>%
       bindEvent(selected_dbs())
 
-    annotation <- reactive({
+    output$annotation_button <- renderUI({
+      actionButton(ns('annotate'), 'Start Annotation')
+    }) %>%
+      bindEvent(selected_dbs())
+
+    annotation <- reactiveVal()
+
+    observe({
+      req(input$annotate)
+
       notid <- showNotification('Annotating with selected databases...',
                                 duration = NULL, closeButton = FALSE)
       on.exit(removeNotification(notid), add = TRUE)
-      mod_identify_all(ms1.data(), ms2.data(), db_dir(), parameter.list())
-    }) %>%
-      bindEvent(input$annotate)
-
-    output$tables_button <- renderUI({
-
-    }) %>%
-      bindEvent(annotation())
-
-    output$annot_order <- renderUI({
-      box(title = 'Choose order of preference for annotations',
-          solidHeader = TRUE,
-          status = 'primary',
-          width = 12,
-          shinyjqui::orderInput(ns('dbs_order'),
-                                'Selected databases',
-                                items = selected_dbs())
-      )
+      annotation(mod_identify_all(feature_table(), ms2_data(), db_dir(), parameter.list()))
     })
 
     output$annot_box <- renderUI({
@@ -245,6 +231,8 @@ dbAnnotationServer <- function(id, data_proc){
           width = 12,
           tabsetPanel(id = ns('annot_tabs'),
                       tabPanel('...',
+                               h3('Annotation successfull.\nCheck results using the button below'),
+                               br(),
                                actionButton(ns('get_table'), 'Get annotation_tables')))
       )
     }) %>%
@@ -253,93 +241,30 @@ dbAnnotationServer <- function(id, data_proc){
 
     observeEvent(input$get_table, {
       tabname <- stringr::str_to_title(stringr::str_replace(selected_dbs(), '_db', ' Database'))
-      #table_id <- stringr::str_replace(selected_dbs(), '_db', '_output')
 
       purrr::map2(tabname, selected_dbs(), function(x,y){
         insertTab(inputId = 'annot_tabs',
-                  tabPanel(x,
-                           dataTableOutput(ns(y))))
+                  tabPanel(x, dataTableOutput(ns(y))))
       })
 
-      for(res in selected_dbs()){
-        output[[res]] <- renderDataTable({
-          mod_get_identification_table(annotation()[[res]])
+      annot_results <- reactive({
+        res <- purrr::map(annotation(), function(x){
+          mod_get_identification_table(x) %>%
+            filter(!is.na(Compound.name))
         })
+        return(res)
+      })
 
+      # TODO avoid cloning results
+
+      for(res in selected_dbs()){
+        output[[res]] <- renderDataTable(
+          annot_results()[[res]],
+          options = list(scrollX = TRUE,
+                         dom = 'ltip')
+        )
       }
     })
-
-
-    # insertTab(inputId = 'annot_tabs',
-    #           tab = tabPanel('dd', h2('ha')),
-    #           target = 'Results')
-
-
-    # ))
-    # })
-
-    # annot_tables <- reactive({
-    #   custom_annot
-    # })
-    #
-    # output$custom_output<- renderDataTable({
-    #   if(input$use_custom){
-    #     mod_get_identification_table(annotation()[['custom_db']])
-    #   } else {
-    #     tibble(Database = '', not_selected = '')
-    #   }
-    # }) %>%
-    #   bindEvent(annotation())
-    #
-    # output$custom_output<- renderDataTable({
-    #   if(input$use_custom){
-    #     mod_get_identification_table(annotation()[['custom_db']])
-    #   } else {
-    #     tibble(Database = '', not_selected = '')
-    #   }
-    # }) %>%
-    #   bindEvent(annotation())
-    #
-    # output$gnps_output <- renderDataTable({
-    #   if(input$use_gnps){
-    #     mod_get_identification_table(annotation()[['gnps_db']])
-    #   } else {
-    #     tibble(Database = '', not_selected = '')
-    #   }
-    # }) %>%
-    #   bindEvent(annotation())
-    #
-    # output$mona_output <- renderDataTable({
-    #   if(input$use_mona){
-    #     mod_get_identification_table(annotation()[['mona_db']])
-    #   } else {
-    #     tibble(Database = '', not_selected = '')
-    #   }
-    # }) %>%
-    #   bindEvent(annotation())
-    # #
-    # output$massbank_output <- renderDataTable({
-    #   if(input$use_massbank){
-    #     mod_get_identification_table(annotation()[['massbank_db']])
-    #   } else {
-    #     tibble(Database = '', not_selected = '')
-    #   }
-    # }) %>%
-    #   bindEvent(annotation())
-    #
-    # output$hmdb_output <- renderDataTable({
-    #   if(input$use_hmdb){
-    #     mod_get_identification_table(annotation()[['hmdb']])
-    #   } else {
-    #     tibble(Database = '', not_selected = '')
-    #   }
-    # }) %>%
-    #   bindEvent(annotation())
-
-    output$test_annot <- renderPrint({
-      names(annotation())
-    })
-
 
   })
 }
