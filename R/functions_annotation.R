@@ -38,7 +38,7 @@ annotate_CAMERA <- function(data, group_by){
 #'@param ms2.data An [MSpectra] object containing MS2 data
 #'@param db_dir Path where the databases are stored
 #'@param parameter.list A list containing the parameters to process each database.
-#'Parameters must be created using [metid::metIdentifyParam()]
+#'Parameters must be created using metid::metIdentifyParam()
 #'
 #'@return A list of [mzIdentifyClass] objects with the annotation results
 #'
@@ -47,21 +47,24 @@ annotate_CAMERA <- function(data, group_by){
 mod_identify_all <- function (ms1.data,
                               ms2.data,
                               db_dir,
-                              parameter.list){
+                              parameter.list,
+                              process_ms2 = FALSE){
 
 
-  threads = parameter.list[[1]]$threads
+  threads = parameter.list[[1]][[1]]$threads
 
   ms1.data <- ms1.data %>%
     dplyr::select(name = FeatureID,
                   mz = mzmed,
                   rt = rtmed)
 
-  message('Parsing MS2 data')
+  if(process_ms2){
+    message('Parsing MS2 data')
 
-  ms2.data <- purrr::map2(ms2.data@listData,
-                          ms2.data@elementMetadata@listData[["feature_id"]],
-                          ~ parse_ms2_for_annotation(.x, TITLE = .y))
+    ms2.data <- purrr::map2(ms2.data@listData,
+                            ms2.data@elementMetadata@listData[["feature_id"]],
+                            ~ parse_ms2_for_annotation(.x, TITLE = .y))
+  }
 
   message('Preparing MS2 data for identification0')
 
@@ -137,6 +140,8 @@ mod_identify_all <- function (ms1.data,
 
     }
 
+    return(result)
+
   })
 
   print('Annotation finished')
@@ -185,12 +190,14 @@ mod_metIdentify <- function(ms1.data,
   ce.list.neg <- unique(unlist(purrr::map(database@spectra.data$Spectra.negative,
                                           names)))
 
-  ce.list <- ifelse(polarity == "positive", ce.list.pos, ce.list.neg)
-  if (all(ce %in% ce.list) & ce != "all") {
-    stop("All ce values you set are not in database. Please check it.\n")
-    ce <- ce[ce %in% ce.list]
+  if(!is.null(ce.list.neg) && !is.null(ce.list.pos)){
+    ce.list <- ifelse(polarity == "positive", ce.list.pos, ce.list.neg)
+    if (all(ce %in% ce.list) & ce != "all") {
+      stop("All ce values you set are not in database. Please check it.\n")
+      ce <- ce[ce %in% ce.list]
+    }
   }
-  rm(list = c("ce.list.pos", "ce.list.neg", "ce.list"))
+  #rm(list = c("ce.list.pos", "ce.list.neg", "ce.list"))
   if (all(ce != "all")) {
     if (polarity == "positive") {
       ce.list <- unique(unlist(lapply(database@spectra.data$Spectra.positive,

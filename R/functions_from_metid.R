@@ -94,6 +94,32 @@ metIdentification <-
     #                )
     # }
 
+
+    # identification.result <- purrr::map(seq_len(nrow(ms1.info)), function(idx){
+    #   identify_peak(
+    #     idx = idx,
+    #     ms1.info = ms1.info,
+    #     ms2.info = ms2.info,
+    #     spectra.info = spectra.info,
+    #     spectra.data = spectra.data,
+    #     ppm.ms1match = ms1.match.ppm,
+    #     ppm.ms2match = ms2.match.ppm,
+    #     mz.ppm.thr = mz.ppm.thr,
+    #     ms2.match.tol = ms2.match.tol,
+    #     rt.match.tol = rt.match.tol,
+    #     ms1.match.weight = ms1.match.weight,
+    #     rt.match.weight = rt.match.weight,
+    #     ms2.match.weight = ms2.match.weight,
+    #     total.score.tol = total.score.tol,
+    #     adduct.table = adduct.table,
+    #     candidate.num = candidate.num,
+    #     fraction.weight = fraction.weight,
+    #     dp.forward.weight = dp.forward.weight,
+    #     dp.reverse.weight = dp.reverse.weight,
+    #     remove_fragment_intensity_cutoff = remove_fragment_intensity_cutoff
+    #   )
+    # })
+
     identification.result <-
       suppressMessages(
         BiocParallel::bplapply(
@@ -299,21 +325,27 @@ identify_peak <-
       seq_len(nrow(match.idx)) %>%
       purrr::map(function(i){
         lib.spec <- spectra.data[[match.idx$Lab.ID[i]]]
-        dp <- lapply(lib.spec, function(y) {
-          y <- as.data.frame(y)
-          y$mz <- as.numeric(y$mz)
-          y$intensity <- as.numeric(y$intensity)
-          masstools::get_spectra_match_score(
-            exp.spectrum = as.data.frame(pk.spec),
-            lib.spectrum = y,
-            ppm.tol = ppm.ms2match,
-            mz.ppm.thr = mz.ppm.thr,
-            fraction.weight = fraction.weight,
-            dp.forward.weight = dp.forward.weight,
-            dp.reverse.weight = dp.reverse.weight,
-            remove_fragment_intensity_cutoff = remove_fragment_intensity_cutoff
-          )
-        })
+        if(!is.null(lib.spec[[1]])){
+          dp <- lapply(lib.spec, function(y) {
+            y <- as.data.frame(y)
+            y$mz <- as.numeric(y$mz)
+            y$intensity <- as.numeric(y$intensity)
+            masstools::get_spectra_match_score(
+              exp.spectrum = as.data.frame(pk.spec),
+              lib.spectrum = y,
+              ppm.tol = ppm.ms2match,
+              mz.ppm.thr = mz.ppm.thr,
+              fraction.weight = fraction.weight,
+              dp.forward.weight = dp.forward.weight,
+              dp.reverse.weight = dp.reverse.weight,
+              remove_fragment_intensity_cutoff = remove_fragment_intensity_cutoff
+            )
+
+          })
+        } else {
+          dp <- list(0)
+          names(dp) <- 'Not available'
+        }
         dp <- dp[which.max(unlist(dp))]
         dp <- unlist(dp)
         data.frame("CE" = names(dp),

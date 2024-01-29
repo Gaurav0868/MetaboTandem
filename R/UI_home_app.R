@@ -1,9 +1,12 @@
-home_ui <- dashboardPage(
-  #md = TRUE,
+
+app_header <- function(home = FALSE){
   dashboardHeader(
     title = tagList(
+      # TODO logo is not showing
       span(class = "logo-lg", "MetaboTandem"),
       img(src = "logo.png")),
+
+    # Notification menu for adding Github and User guide link
     dropdownMenu(
       type = 'notifications',
       icon = icon('question-circle'),
@@ -17,9 +20,24 @@ home_ui <- dashboardPage(
                        href = 'https://github.com/Coayala/MetaboTandem')
     ),
     leftUi = tagList(
-      h4('Welcome to MetaboTandem', style = "color:white")
+      if(home){
+        h4('Welcome to MetaboTandem', style = "color:white")
+      } else {
+        h4()
+      }
+
     )
-  ),
+  )
+}
+
+
+#' Homepage UI
+#'
+#' UI for displaying MetaboTandem Homepage
+home_ui <- dashboardPage(
+  #md = TRUE,
+
+  app_header(home = TRUE),
 
   # Sidebar content
   dashboardSidebar(),
@@ -27,6 +45,7 @@ home_ui <- dashboardPage(
   # Body content
   dashboardBody(
     fluidRow(
+      # Box for Autotuner
       box(title = 'Estimate Parameters',
           headerBorder = FALSE,
           background = 'purple',
@@ -43,6 +62,8 @@ home_ui <- dashboardPage(
                                             size = 'lg'))
           )
       ),
+
+      # Box for the main pipeline
       box(title = 'Full Data analysis',
           headerBorder = FALSE,
           background = 'light-blue',
@@ -59,6 +80,8 @@ home_ui <- dashboardPage(
                                             size = 'lg'))
           )
       ),
+
+      # Box for manage databases
       box(title = 'Manage Databases',
           headerBorder = FALSE,
           background = 'olive',
@@ -77,6 +100,8 @@ home_ui <- dashboardPage(
             #this is were box is made active to go to database
           )
       ),
+
+      # Box for the annotate MGF
       box(title = 'Annotate MGF',
           headerBorder = FALSE,
           background = 'maroon',
@@ -93,33 +118,6 @@ home_ui <- dashboardPage(
                                             size = 'lg'))
           )
       )
-    )
-  )
-)
-
-
-database_appUI <- dashboardPage(
-  dashboardHeader(),
-  dashboardSidebar(),
-  dashboardBody(
-    shinyWidgets::actionBttn(
-      inputId = 'goHome_database',
-      label = 'Return Home',
-      style = 'material-flat',
-      color = 'success'
-    )
-  )
-)
-
-test_appUI <- dashboardPage(
-  dashboardHeader(),
-  dashboardSidebar(),
-  dashboardBody(
-    shinyWidgets::actionBttn(
-      inputId = 'goHome_autotuner',
-      label = 'Return Home',
-      style = 'material-flat',
-      color = 'success'
     )
   )
 )
