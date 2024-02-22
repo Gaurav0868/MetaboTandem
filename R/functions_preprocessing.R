@@ -137,7 +137,8 @@ apply_peak_picking <- function(data,
                                fwhm = 30,
                                sigma = 12.72,
                                max = 10,
-                               steps = 2){
+                               steps = 2,
+                               BPPARAM = SnowParam(workers = 4, type ="SOCK")){
   # Test peak picking parameters
 
   if(method == 'cw'){
